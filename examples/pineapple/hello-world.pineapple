@@ -1,0 +1,3 @@
+
+$a = "你好，我是pineapple-ts"
+print($a)

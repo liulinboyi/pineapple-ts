@@ -13,7 +13,7 @@ function NewGlobalVariables() {
 }
 
 
-function Execute(code: string) {
+export function Execute(code: string) {
     var ast = {}
 
     let g = NewGlobalVariables()
@@ -77,6 +77,6 @@ function resolvePrint(g: any, print: any) {
 
 
 // test
-Execute(`$a = "你好，我是pineapple11"
-print($a)
-`)
+// Execute(`$a = "你好，我是pineapple11"
+// print($a)
+// `)

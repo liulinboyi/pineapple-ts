@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Execute = void 0;
 const parser_1 = require("./parser");
 let GlobalVariables = {
     Variables: {}
@@ -17,6 +18,7 @@ function Execute(code) {
     // resolve
     resolveAST(g, ast);
 }
+exports.Execute = Execute;
 function resolveAST(g, ast) {
     if (ast.Statements.length == 0) {
         throw new Error("resolveAST(): no code to execute, please check your input.");
@@ -65,7 +67,7 @@ function resolvePrint(g, print) {
     return null;
 }
 // test
-Execute(`$a = "你好，我是pineapple11"
-print($a)
-`);
+// Execute(`$a = "你好，我是pineapple11"
+// print($a)
+// `)
 //# sourceMappingURL=backend.js.map

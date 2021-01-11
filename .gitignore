@@ -1,4 +1,5 @@
 /node_modules/
 /src/*.js.map
 /dist/*.js.map
+/examples/*/*.js.map
 /.cache/
