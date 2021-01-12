@@ -1,7 +1,7 @@
 import { Lexer, NewLexer, tokenNameMap, Tokens } from "./lexer1"
 import { Variable } from './definition'
 
-const { TOKEN_EOF,                // end-of-file
+const { TOKEN_EOF,            // end-of-file
     TOKEN_VAR_PREFIX,         // $
     TOKEN_LEFT_PAREN,         // (
     TOKEN_RIGHT_PAREN,        // )

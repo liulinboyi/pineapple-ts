@@ -24,7 +24,7 @@ export enum Tokens {
     TOKEN_IGNORED,            // Ignored  
 }
 
-const { TOKEN_EOF,                // end-of-file
+const { TOKEN_EOF,            // end-of-file
     TOKEN_VAR_PREFIX,         // $
     TOKEN_LEFT_PAREN,         // (
     TOKEN_RIGHT_PAREN,        // )
