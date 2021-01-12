@@ -74,9 +74,3 @@ function resolvePrint(g: any, print: any) {
     console.log(str)
     return null
 }
-
-
-// test
-// Execute(`$a = "你好，我是pineapple11"
-// print($a)
-// `)

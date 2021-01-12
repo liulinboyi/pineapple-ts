@@ -66,8 +66,4 @@ function resolvePrint(g, print) {
     console.log(str);
     return null;
 }
-// test
-// Execute(`$a = "你好，我是pineapple11"
-// print($a)
-// `)
 //# sourceMappingURL=backend.js.map
