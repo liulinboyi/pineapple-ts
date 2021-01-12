@@ -14,4 +14,5 @@ npm run test
 ```
 
 ## Contributors
+- [karminski](https://github.com/karminski)
 - [liulinboyi](https://github.com/liulinboyi)
