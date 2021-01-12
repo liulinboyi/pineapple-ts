@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NewLexer = exports.Lexer = exports.keywords = exports.tokenNameMap = exports.Tokens = void 0;
+exports.NewLexer = exports.Lexer = exports.tokenNameMap = exports.keywords = exports.Tokens = void 0;
 // token const
 var Tokens;
 (function (Tokens) {
@@ -25,6 +25,11 @@ TOKEN_DUOQUOTE, // ""
 TOKEN_NAME, // Name ::= [_A-Za-z][_0-9A-Za-z]*
 TOKEN_PRINT, // print
 TOKEN_IGNORED, } = Tokens;
+// regex match patterns
+const regexName = /^[_\d\w]+/;
+exports.keywords = {
+    "print": TOKEN_PRINT,
+};
 exports.tokenNameMap = {
     [TOKEN_EOF]: "EOF",
     [TOKEN_VAR_PREFIX]: "$",
@@ -37,18 +42,13 @@ exports.tokenNameMap = {
     [TOKEN_PRINT]: "print",
     [TOKEN_IGNORED]: "Ignored",
 };
-exports.keywords = {
-    "print": TOKEN_PRINT,
-};
-// regex match patterns
-const regexName = /^[_\d\w]+/;
 class Lexer {
     constructor(sourceCode, lineNum, nextToken, nextTokenType, nextTokenLineNum) {
         this.sourceCode = sourceCode;
         this.lineNum = lineNum;
         this.nextToken = nextToken;
         this.nextTokenType = nextTokenType;
-        this.nextTokenLineNum = nextTokenLineNum;
+        this.hasCache = false;
     }
     /**
     * 断言下一个 Token 是什么
@@ -64,12 +64,12 @@ class Lexer {
     // MatchToken() 的封装，每一次调用，都会吃掉相应Token
     GetNextToken() {
         // next token already loaded
-        if (this.nextTokenLineNum > 0) {
-            let lineNum = this.nextTokenLineNum;
+        if (this.hasCache) {
+            // 在LookAhead和LookAheadSkip处对nextTokenLineNum进行了赋值操作
+            let lineNum = this.lineNum;
             let tokenType = this.nextTokenType;
             let token = this.nextToken;
-            this.lineNum = this.nextTokenLineNum;
-            this.nextTokenLineNum = 0;
+            this.hasCache = false;
             return {
                 lineNum,
                 tokenType,
@@ -194,30 +194,28 @@ class Lexer {
      */
     LookAhead() {
         // lexer.nextToken already setted
-        if (this.nextTokenLineNum > 0) {
+        if (this.hasCache) {
             return this.nextTokenType;
         }
         // set it
         // 当前行
-        let nowLineNum = this.lineNum;
         let { lineNum, tokenType, token } = this.GetNextToken();
-        this.lineNum = nowLineNum;
         // *
         // 下一行
-        this.nextTokenLineNum = lineNum;
+        this.hasCache = true;
+        this.lineNum = lineNum;
         this.nextTokenType = tokenType;
         this.nextToken = token;
         return tokenType;
     }
     LookAheadAndSkip(expectedType) {
         // get next token
-        let nowLineNum = this.lineNum;
         // 查看看下一个Token信息
         let { lineNum, tokenType, token } = this.GetNextToken();
         // not is expected type, reverse cursor
         if (tokenType != expectedType) {
-            this.lineNum = nowLineNum;
-            this.nextTokenLineNum = lineNum;
+            this.hasCache = true;
+            this.lineNum = lineNum;
             this.nextTokenType = tokenType;
             this.nextToken = token;
         }
@@ -238,4 +236,4 @@ function NewLexer(sourceCode) {
     return new Lexer(sourceCode, 1, "", 0, 0); // start at line 1 in default.
 }
 exports.NewLexer = NewLexer;
-//# sourceMappingURL=lexer.js.map
+//# sourceMappingURL=lexer1.js.map

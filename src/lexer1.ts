@@ -7,8 +7,8 @@ export interface Lexer {
     nextToken: string
     nextTokenType: number
     nextTokenLineNum: number
+    hasCache: boolean
 }
-
 
 // token const
 export enum Tokens {
@@ -36,6 +36,13 @@ const { TOKEN_EOF,                // end-of-file
     TOKEN_IGNORED,            // Ignored  
 } = Tokens
 
+// regex match patterns
+const regexName = /^[_\d\w]+/
+
+export const keywords: Keywords = {
+    "print": TOKEN_PRINT,
+}
+
 export const tokenNameMap: TokenNameMap = {
     [TOKEN_EOF]: "EOF",
     [TOKEN_VAR_PREFIX]: "$",
@@ -49,22 +56,13 @@ export const tokenNameMap: TokenNameMap = {
     [TOKEN_IGNORED]: "Ignored",
 }
 
-export const keywords: Keywords = {
-    "print": TOKEN_PRINT,
-}
-
-// regex match patterns
-const regexName = /^[_\d\w]+/
-
-
-
 export class Lexer {
     constructor(sourceCode: string, lineNum: number, nextToken: string, nextTokenType: number, nextTokenLineNum: number) {
         this.sourceCode = sourceCode;
         this.lineNum = lineNum;
         this.nextToken = nextToken;
         this.nextTokenType = nextTokenType;
-        this.nextTokenLineNum = nextTokenLineNum;
+        this.hasCache = false;
     }
 
     /**
@@ -84,12 +82,12 @@ export class Lexer {
     // MatchToken() 的封装，每一次调用，都会吃掉相应Token
     GetNextToken(): { lineNum: number, tokenType: number, token: string } {
         // next token already loaded
-        if (this.nextTokenLineNum > 0) {
-            let lineNum = this.nextTokenLineNum
+        if (this.hasCache) {
+            // 在LookAhead和LookAheadSkip处对nextTokenLineNum进行了赋值操作
+            let lineNum = this.lineNum
             let tokenType = this.nextTokenType
             let token = this.nextToken
-            this.lineNum = this.nextTokenLineNum
-            this.nextTokenLineNum = 0
+            this.hasCache = false
             return {
                 lineNum,
                 tokenType,
@@ -210,17 +208,16 @@ export class Lexer {
      */
     LookAhead(): number {
         // lexer.nextToken already setted
-        if (this.nextTokenLineNum > 0) {
+        if (this.hasCache) {
             return this.nextTokenType
         }
         // set it
         // 当前行
-        let nowLineNum = this.lineNum
         let { lineNum, tokenType, token } = this.GetNextToken()
-        this.lineNum = nowLineNum
         // *
         // 下一行
-        this.nextTokenLineNum = lineNum
+        this.hasCache = true
+        this.lineNum = lineNum
         this.nextTokenType = tokenType
         this.nextToken = token
         return tokenType
@@ -228,13 +225,12 @@ export class Lexer {
 
     LookAheadAndSkip(expectedType: number) {
         // get next token
-        let nowLineNum = this.lineNum
         // 查看看下一个Token信息
         let { lineNum, tokenType, token } = this.GetNextToken()
         // not is expected type, reverse cursor
         if (tokenType != expectedType) {
-            this.lineNum = nowLineNum
-            this.nextTokenLineNum = lineNum
+            this.hasCache = true
+            this.lineNum = lineNum
             this.nextTokenType = tokenType
             this.nextToken = token
         }
@@ -255,3 +251,4 @@ export class Lexer {
 export function NewLexer(sourceCode: string): Lexer {
     return new Lexer(sourceCode, 1, "", 0, 0) // start at line 1 in default.
 }
+

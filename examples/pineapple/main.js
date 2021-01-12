@@ -12,8 +12,10 @@ if (args[0]) {
         code = fs_1.default.readFileSync(args[0], { encoding: 'utf-8' });
     }
     catch (error) {
-        throw new Error(`Error reading file: ${args[0]}\n`);
+        console.log(`Error reading file: ${args[0]}`);
     }
-    backend_1.Execute(code);
+    if (code.length > 0) {
+        backend_1.Execute(code);
+    }
 }
 //# sourceMappingURL=main.js.map

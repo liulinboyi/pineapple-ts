@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Launch Program",
-            "program": "${workspaceFolder}/src/backend.js",
+            "program": "${workspaceFolder}/examples/pineapple/main.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"

@@ -1,6 +1,17 @@
-import { Lexer, NewLexer, tokenNameMap, Tokens } from "./lexer"
+import { Lexer, NewLexer, tokenNameMap, Tokens } from "./lexer1"
 import { Variable } from './definition'
 
+const { TOKEN_EOF,                // end-of-file
+    TOKEN_VAR_PREFIX,         // $
+    TOKEN_LEFT_PAREN,         // (
+    TOKEN_RIGHT_PAREN,        // )
+    TOKEN_EQUAL,              // =
+    TOKEN_QUOTE,              // "
+    TOKEN_DUOQUOTE,           // ""
+    TOKEN_NAME,               // Name ::= [_A-Za-z][_0-9A-Za-z]*
+    TOKEN_PRINT,              // print
+    TOKEN_IGNORED,            // Ignored  
+} = Tokens
 
 export interface Assignment {
     LineNum?: number,
@@ -26,6 +37,7 @@ function parseSourceCode(lexer: Lexer) {
 function parseStatements(lexer: Lexer) {
     let statements: Array<Variable> = []
 
+    // 先调用LookAhead一次，将GetNextToken的结果缓存
     while (!isSourceCodeEnd(lexer.LookAhead())) {
         let statement = {}
         statement = parseStatement(lexer)
@@ -34,24 +46,22 @@ function parseStatements(lexer: Lexer) {
     return statements
 }
 
-function isSourceCodeEnd(token: number): boolean {
-    if (token == Tokens.TOKEN_EOF) {
-        return true
-    }
-    return false
-}
-
 function parseStatement(lexer: Lexer) {
-    lexer.LookAheadAndSkip(Tokens.TOKEN_IGNORED) // skip if source code start with ignored token
+    // 向前看一个token并跳过
+    lexer.LookAheadAndSkip(TOKEN_IGNORED) // skip if source code start with ignored token
     let look = lexer.LookAhead()
     switch (look) {
-        case Tokens.TOKEN_PRINT:
+        case TOKEN_PRINT:
             return parsePrint(lexer)
-        case Tokens.TOKEN_VAR_PREFIX:
+        case TOKEN_VAR_PREFIX:
             return parseAssignment(lexer)
         default:
             throw new Error("parseStatement(): unknown Statement.")
     }
+}
+
+function isSourceCodeEnd(token: number): boolean {
+    return token === TOKEN_EOF
 }
 
 export class Print {
@@ -65,16 +75,15 @@ export class Print {
 function parsePrint(lexer: Lexer) {
     let print = new Print()
 
-
     print.LineNum = lexer.GetLineNum()
-    lexer.NextTokenIs(Tokens.TOKEN_PRINT)
-    lexer.NextTokenIs(Tokens.TOKEN_LEFT_PAREN)
-    lexer.LookAheadAndSkip(Tokens.TOKEN_IGNORED)
+    lexer.NextTokenIs(TOKEN_PRINT)
+    lexer.NextTokenIs(TOKEN_LEFT_PAREN)
+    lexer.LookAheadAndSkip(TOKEN_IGNORED)
     print.Variable = parseVariable(lexer)
 
-    lexer.LookAheadAndSkip(Tokens.TOKEN_IGNORED)
-    lexer.NextTokenIs(Tokens.TOKEN_RIGHT_PAREN)
-    lexer.LookAheadAndSkip(Tokens.TOKEN_IGNORED)
+    lexer.LookAheadAndSkip(TOKEN_IGNORED)
+    lexer.NextTokenIs(TOKEN_RIGHT_PAREN)
+    lexer.LookAheadAndSkip(TOKEN_IGNORED)
     return print
 }
 
@@ -86,16 +95,16 @@ function parseVariable(lexer: Lexer) {
     } = {}
 
     variable.LineNum = lexer.GetLineNum()
-    lexer.NextTokenIs(Tokens.TOKEN_VAR_PREFIX)
+    lexer.NextTokenIs(TOKEN_VAR_PREFIX)
     variable.Name = parseName(lexer)
 
-    lexer.LookAheadAndSkip(Tokens.TOKEN_IGNORED)
+    lexer.LookAheadAndSkip(TOKEN_IGNORED)
     return variable
 }
 
 // Name ::= [_A-Za-z][_0-9A-Za-z]*
 function parseName(lexer: Lexer) {
-    let { nowLineNum: _, nowToken: name } = lexer.NextTokenIs(Tokens.TOKEN_NAME)
+    let { nowLineNum: _, nowToken: name } = lexer.NextTokenIs(TOKEN_NAME)
     return name
 }
 
@@ -115,12 +124,12 @@ function parseAssignment(lexer: Lexer) {
     assignment.LineNum = lexer.GetLineNum()
     assignment.Variable = parseVariable(lexer)
 
-    lexer.LookAheadAndSkip(Tokens.TOKEN_IGNORED)
-    lexer.NextTokenIs(Tokens.TOKEN_EQUAL)
-    lexer.LookAheadAndSkip(Tokens.TOKEN_IGNORED)
+    lexer.LookAheadAndSkip(TOKEN_IGNORED)
+    lexer.NextTokenIs(TOKEN_EQUAL)
+    lexer.LookAheadAndSkip(TOKEN_IGNORED)
     assignment.String = parseString(lexer)
 
-    lexer.LookAheadAndSkip(Tokens.TOKEN_IGNORED)
+    lexer.LookAheadAndSkip(TOKEN_IGNORED)
     return assignment
 }
 
@@ -129,15 +138,15 @@ function parseString(lexer: Lexer) {
     let str = ""
     let look = lexer.LookAhead()
     switch (look) {
-        case Tokens.TOKEN_DUOQUOTE:
-            lexer.NextTokenIs(Tokens.TOKEN_DUOQUOTE)
-            lexer.LookAheadAndSkip(Tokens.TOKEN_IGNORED)
+        case TOKEN_DUOQUOTE:
+            lexer.NextTokenIs(TOKEN_DUOQUOTE)
+            lexer.LookAheadAndSkip(TOKEN_IGNORED)
             return str
-        case Tokens.TOKEN_QUOTE:
-            lexer.NextTokenIs(Tokens.TOKEN_QUOTE)
-            str = lexer.scanBeforeToken(tokenNameMap[Tokens.TOKEN_QUOTE])
-            lexer.NextTokenIs(Tokens.TOKEN_QUOTE)
-            lexer.LookAheadAndSkip(Tokens.TOKEN_IGNORED)
+        case TOKEN_QUOTE:
+            lexer.NextTokenIs(TOKEN_QUOTE)
+            str = lexer.scanBeforeToken(tokenNameMap[TOKEN_QUOTE])
+            lexer.NextTokenIs(TOKEN_QUOTE)
+            lexer.LookAheadAndSkip(TOKEN_IGNORED)
             return str
         default:
             return ""
@@ -149,13 +158,7 @@ export function parse(code: string) {
     let lexer = NewLexer(code)
     let sourceCode = parseSourceCode(lexer);
 
-    lexer.NextTokenIs(Tokens.TOKEN_EOF)
+    lexer.NextTokenIs(TOKEN_EOF)
+    // console.log(JSON.stringify(sourceCode), 'sourceCode')
     return sourceCode
 }
-
-// test
-
-// const paserResult = parse(`$a = "你好，我是pineapple"
-// print($a)`)
-
-// console.log(JSON.stringify(paserResult))
