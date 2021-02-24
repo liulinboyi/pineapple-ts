@@ -3,3 +3,4 @@
 /dist/*.js.map
 /examples/*/*.js.map
 /.cache/
+/src/*/*.js.map

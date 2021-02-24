@@ -14,6 +14,11 @@ var Tokens;
     Tokens[Tokens["TOKEN_NAME"] = 7] = "TOKEN_NAME";
     Tokens[Tokens["TOKEN_PRINT"] = 8] = "TOKEN_PRINT";
     Tokens[Tokens["TOKEN_IGNORED"] = 9] = "TOKEN_IGNORED";
+    Tokens[Tokens["INTERGER"] = 10] = "INTERGER";
+    Tokens[Tokens["NUMBER"] = 11] = "NUMBER";
+    Tokens[Tokens["STRING"] = 12] = "STRING";
+    Tokens[Tokens["COMMENT"] = 13] = "COMMENT";
+    Tokens[Tokens["SourceCharacter"] = 14] = "SourceCharacter";
 })(Tokens = exports.Tokens || (exports.Tokens = {}));
 const { TOKEN_EOF, // end-of-file
 TOKEN_VAR_PREFIX, // $
@@ -24,9 +29,15 @@ TOKEN_QUOTE, // "
 TOKEN_DUOQUOTE, // ""
 TOKEN_NAME, // Name ::= [_A-Za-z][_0-9A-Za-z]*
 TOKEN_PRINT, // print
-TOKEN_IGNORED, } = Tokens;
+TOKEN_IGNORED, // Ignored  
+INTERGER, // [0-9]+
+NUMBER, // Integer Ignored
+STRING, // String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
+COMMENT, // Ignored "#" SourceCharacter Ignored
+SourceCharacter, } = Tokens;
 // regex match patterns
 const regexName = /^[_\d\w]+/;
+// 关键字
 exports.keywords = {
     "print": TOKEN_PRINT,
 };
@@ -41,6 +52,11 @@ exports.tokenNameMap = {
     [TOKEN_NAME]: "Name",
     [TOKEN_PRINT]: "print",
     [TOKEN_IGNORED]: "Ignored",
+    [INTERGER]: "INTERGER",
+    [NUMBER]: "NUMBER",
+    [STRING]: "STRING",
+    [COMMENT]: "COMMENT",
+    [SourceCharacter]: "SourceCharacter",
 };
 class Lexer {
     constructor(sourceCode, lineNum, nextToken, nextTokenType, nextTokenLineNum) {
@@ -89,6 +105,10 @@ class Lexer {
         if (this.sourceCode.length == 0) {
             return { lineNum: this.lineNum, tokenType: TOKEN_EOF, token: exports.tokenNameMap[TOKEN_EOF] };
         }
+        // 如果nextTokenType是#，并且字符串能匹配上，则表示是源代码字符串
+        // if (this.sourceCode[0].match(/\*/)) {
+        //     return { lineNum: this.lineNum, tokenType: SourceCharacter, token: tokenNameMap[SourceCharacter] }
+        // }
         // check token
         switch (this.sourceCode[0]) {
             case '$':
@@ -110,9 +130,13 @@ class Lexer {
                 }
                 this.skipSourceCode(1);
                 return { lineNum: this.lineNum, tokenType: TOKEN_QUOTE, token: "\"" };
+            case '#':
+                this.skipSourceCode(1);
+                return { lineNum: this.lineNum, tokenType: COMMENT, token: "#" };
         }
         // check multiple character token
         if (this.sourceCode[0] == '_' || this.isLetter(this.sourceCode[0])) {
+            // 扫描关键字
             let token = this.scanName();
             let tokenType = exports.keywords[token];
             let isMatch = tokenType !== undefined ? true : false;
@@ -123,8 +147,17 @@ class Lexer {
                 return { lineNum: this.lineNum, tokenType: TOKEN_NAME, token };
             }
         }
+        if (this.isNumber(this.sourceCode[0])) {
+            return { lineNum: this.lineNum, tokenType: NUMBER, token: this.sourceCode[0] };
+        }
         // unexpected symbol
         throw new Error(`MatchToken(): unexpected symbol near '${this.sourceCode[0]}'.`);
+    }
+    isNumber(c) {
+        return this.isInterger(c);
+    }
+    isInterger(c) {
+        return /[0-9]/.test(c);
     }
     isLetter(c) {
         return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
@@ -134,6 +167,12 @@ class Lexer {
     }
     nextSourceCodeIs(s) {
         return this.sourceCode.startsWith(s);
+    }
+    isNewLine(c) {
+        return c == '\r' || c == '\n';
+    }
+    isEmpty() {
+        return this.sourceCode.length === 0;
     }
     isIgnored() {
         let isIgnored = false;
@@ -147,7 +186,7 @@ class Lexer {
             }
             return false;
         };
-        // matching
+        // matching 匹配isIgnored的情况，把isIgnored的字符都吃掉
         while (this.sourceCode.length > 0) {
             if (this.nextSourceCodeIs("\r\n") || this.nextSourceCodeIs("\n\r")) {
                 this.skipSourceCode(2);
@@ -195,7 +234,8 @@ class Lexer {
     LookAhead() {
         // lexer.nextToken already setted
         if (this.hasCache) {
-            return this.nextTokenType;
+            return { tokenType: this.nextTokenType, lineNum: this.lineNum, token: this.nextToken };
+            // return this.nextTokenType
         }
         // set it
         // 当前行
@@ -206,7 +246,7 @@ class Lexer {
         this.lineNum = lineNum;
         this.nextTokenType = tokenType;
         this.nextToken = token;
-        return tokenType;
+        return { tokenType, lineNum, token };
     }
     LookAheadAndSkip(expectedType) {
         // get next token
@@ -222,6 +262,8 @@ class Lexer {
     }
     // return content before token
     scanBeforeToken(token) {
+        // 以单个双引号，划分数组
+        // 由于前面已经吃掉了一个单个双引了，此时处理如下 eg: 'aa"后面其他字符串'.split("\"")
         let s = this.sourceCode.split(token);
         if (s.length < 2) {
             console.log("unreachable!");

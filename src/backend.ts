@@ -1,5 +1,8 @@
-import { Assignment, parse, Print } from "./parser"
+import { parse } from "./parser"
 import { GlobalVariables } from './definition'
+import { Assignment } from "./parser/Assignment"
+import { Print } from "./parser/Print"
+import { Comment } from "./parser/Comment"
 
 let GlobalVariables: GlobalVariables = {
     Variables: {}
@@ -20,6 +23,9 @@ export function Execute(code: string) {
 
     // parse
     ast = parse(code)
+
+    console.log(JSON.stringify(ast, null, 4), '\r\rAST')
+    console.log("--------------------------------------------")
 
     // resolve
     resolveAST(g, ast)
@@ -42,6 +48,8 @@ function resolveStatement(g: any, statement: any) {
     } else if (statement instanceof Print) {
         let print = statement
         return resolvePrint(g, print)
+    } else if (statement instanceof Comment) {
+        // 注释，什么也不做
     } else {
         throw new Error("resolveStatement(): undefined statement type.")
     }
@@ -53,7 +61,14 @@ function resolveAssignment(g: any, assignment: any) {
     if (varName == "") {
         throw new Error("resolveAssignment(): variable name can NOT be empty.")
     }
-    g.Variables[varName] = assignment.String
+    if (assignment.String !== null && assignment.String !== undefined) {
+        g.Variables[varName] = assignment.String
+    } else if (assignment.Number !== null && assignment.Number !== undefined) {
+        g.Variables[varName] = assignment.Number
+    } else {
+        throw new Error("Ivalie value.");
+    }
+
     return null
 }
 
@@ -61,13 +76,16 @@ function resolveAssignment(g: any, assignment: any) {
 function resolvePrint(g: any, print: any) {
     let varName = ""
     varName = print.Variable.Name;
+    // console.log(varName, 'varName')
+    // console.log(g, 'g')
     if (varName == "") {
         throw new Error("resolvePrint(): variable name can NOT be empty.")
     }
     let str = ""
     let ok = false
     str = g.Variables[varName]
-    ok = str ? true : false
+    // console.log(str, 'str')
+    ok = str !== null && str !== undefined ? true : false
     if (!ok) {
         throw new Error(`resolvePrint(): variable '$${varName}'not found.`)
     }

@@ -1,0 +1,10 @@
+$a = 0
+print($a)
+
+$b = "这是pineapple"
+print($b)
+
+# 这是注释           hahahahahahahhaha    \r\n
+
+$c = 1
+print($c)
