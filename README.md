@@ -1,5 +1,23 @@
 # pineapple-ts
 
+## 可以用[在线解析EBNF](https://bottlecaps.de/rr/ui)
+## EBNF：
+```
+SourceCharacter ::=  #x0009 | #x000A | #x000D | [#x0020-#xFFFF] // 大部分的 Unicode 
+Name            ::= [_A-Za-z][_0-9A-Za-z]* // 标识符名称第一部分只能出现一次，后面部分零次或多次 
+StringCharacter ::= SourceCharacter - '"' // - '"' 代表不包含双引号 ", 即 StringCharacter 是 SourceCharacter 但不包含双引号. (String 要用双引号作为结束/闭合的标记) 
+Integer         ::= [0-9]+
+Number          ::= Integer Ignored
+String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
+Variable        ::= "$" Name Ignored // 变量 
+Assignment      ::= Variable Ignored '=' Ignored ( String | Number ) Ignored
+Print           ::= "print" "(" Ignored Variable Ignored ")" Ignored
+Statement       ::= Print | Assignment
+SourceCode      ::= Statement+ 
+Comment         ::= Ignored "#" SourceCharacter Ignored // 注释 
+
+```
+
 TypeScript implementation of pineapple language (https://github.com/karminski/pineapple) as a personal exercise.
 
 [karminski/pineapple](https://github.com/karminski/pineapple)
