@@ -57,22 +57,21 @@ export function parseAssignment(lexer: Lexer) {
     if (lexer.LookAhead().tokenType === TOKEN_VAR_PREFIX) {
         const Variable = parseVariable(lexer) // 标识符
         console.log(Variable, 'Variable')
-        assignment.Variable = Variable
+        const identifier = { name: Variable.Name, type: "Identifier" }
+        VariableDeclarator.init = identifier
+        assignment.type = "VariableDeclaration"
+        assignment.declarations.push(VariableDeclarator) // 一行只允许声明和初始化一个变量
         return assignment
     } else {
         if (lexer.isNumber(lexer.sourceCode[0])) {
             // console.log('parseNumber start')
             const literial = new Literal(parseNumber(lexer))
             VariableDeclarator.init = literial
-            // assignment.Literal = literial
-            // assignment.type = tokenNameMap[NUMBER]
             assignment.type = "VariableDeclaration"
             // console.log('parseNumber end')
         } else {
             const literial = new Literal(parseString(lexer))
-            // assignment.Literal = literial
             VariableDeclarator.init = literial
-            // assignment.type = tokenNameMap[STRING]
             assignment.type = "VariableDeclaration"
         }
 

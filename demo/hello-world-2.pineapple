@@ -3,3 +3,4 @@ $b = 1
 #print($b)
 #$e = "啊哈哈哈哈"
 $c = $b
+print($c)

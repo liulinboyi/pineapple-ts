@@ -38,7 +38,11 @@ function parseAssignment(lexer) {
     if (lexer.LookAhead().tokenType === parser_1.TOKEN_VAR_PREFIX) {
         const Variable = parser_1.parseVariable(lexer); // 标识符
         console.log(Variable, 'Variable');
-        assignment.Variable = Variable;
+        const identifier = { name: Variable.Name, type: "Identifier" };
+        VariableDeclarator.init = identifier;
+        assignment.type = "VariableDeclaration";
+        assignment.declarations.push(VariableDeclarator); // 一行只允许声明和初始化一个变量
+        // assignment.Variable = Variable
         return assignment;
     }
     else {
