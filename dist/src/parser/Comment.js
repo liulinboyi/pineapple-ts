@@ -28,4 +28,3 @@ function paseComment(lexer) {
     return comment;
 }
 exports.paseComment = paseComment;
-//# sourceMappingURL=Comment.js.map

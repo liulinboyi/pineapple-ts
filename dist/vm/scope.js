@@ -110,4 +110,3 @@ class Scope {
     }
 }
 module.exports = Scope;
-//# sourceMappingURL=scope.js.map

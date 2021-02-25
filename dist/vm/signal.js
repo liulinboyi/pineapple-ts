@@ -33,4 +33,3 @@ class Signal {
     }
 }
 module.exports = Signal;
-//# sourceMappingURL=signal.js.map

@@ -7,4 +7,3 @@ console.log(code, 'code');
 if (code.length > 0) {
     Execute(code);
 }
-//# sourceMappingURL=test.js.map

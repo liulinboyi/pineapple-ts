@@ -69,4 +69,3 @@ const standardMap = {
     clearInterval: new SimpleValue(clearInterval)
 };
 module.exports = standardMap;
-//# sourceMappingURL=standard.js.map

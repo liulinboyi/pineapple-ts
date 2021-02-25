@@ -35,4 +35,3 @@ class Canjs {
     }
 }
 module.exports = Canjs;
-//# sourceMappingURL=index.js.map

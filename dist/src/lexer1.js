@@ -292,4 +292,3 @@ function NewLexer(sourceCode) {
     return new Lexer(sourceCode, 1, "", 0, 0); // start at line 1 in default.
 }
 exports.NewLexer = NewLexer;
-//# sourceMappingURL=lexer1.js.map

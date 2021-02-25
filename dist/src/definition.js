@@ -5,4 +5,3 @@ Object.defineProperty(exports, "__esModule", { value: true });
 //     Name?: string,
 //     [x: string]: any
 // }
-//# sourceMappingURL=definition.js.map

@@ -57,4 +57,3 @@ class NodeIterator {
     }
 }
 module.exports = NodeIterator;
-//# sourceMappingURL=iterator.js.map

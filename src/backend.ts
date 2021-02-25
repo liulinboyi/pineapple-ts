@@ -25,9 +25,12 @@ export function Execute(code: string) {
     // parse
     ast = parse(code)
 
-    for (let item in ast.body) {
-        if (ast.body[item].type === "COMMENT") { // 如果是注释，删除
-            ast.body.splice(item, 1)
+    for (let i = 0; i < ast.body.length; i++) {
+        console.log(ast.body[i].type, 'type')
+        if (ast.body[i].type === "COMMENT") { // 如果是注释，删除
+            console.log(i)
+            ast.body.splice(i, 1)
+            i--;
         }
     }
 

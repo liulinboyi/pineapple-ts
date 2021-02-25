@@ -118,4 +118,3 @@ function parse(code) {
     return sourceCode;
 }
 exports.parse = parse;
-//# sourceMappingURL=parser.js.map

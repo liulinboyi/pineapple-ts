@@ -53,4 +53,3 @@ class MemberValue {
 }
 module.exports.SimpleValue = SimpleValue;
 module.exports.MemberValue = MemberValue;
-//# sourceMappingURL=value.js.map

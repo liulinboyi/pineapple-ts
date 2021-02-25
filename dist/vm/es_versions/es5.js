@@ -506,4 +506,3 @@ function getIdentifierOrMemberExpressionValue(node, nodeIterator) {
     }
 }
 module.exports = NodeHandler;
-//# sourceMappingURL=es5.js.map

@@ -18,4 +18,3 @@ if (args[0]) {
         backend_1.Execute(code);
     }
 }
-//# sourceMappingURL=main.js.map
