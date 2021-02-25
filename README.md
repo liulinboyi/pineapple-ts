@@ -10,11 +10,13 @@ Integer         ::= [0-9]+
 Number          ::= Integer Ignored
 String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
 Variable        ::= "$" Name Ignored // 变量 
-Assignment      ::= Variable Ignored '=' Ignored ( String | Number ) Ignored
+Assignment      ::= Variable Ignored '=' Ignored ( String | Number |  Variable) Ignored
 Print           ::= "print" "(" Ignored Variable Ignored ")" Ignored
 Statement       ::= Print | Assignment
 SourceCode      ::= Statement+ 
-Comment         ::= Ignored "#" SourceCharacter Ignored // 注释 
+Comment         ::= Ignored "#" SourceCharacter // 注释 
+Expression      ::= Variable Ignored Operator Ignored Variable
+Operator        ::= "+" | "-" | "*" | "/"
 
 ```
 
@@ -34,3 +36,6 @@ npm run test
 ## Contributors
 - [karminski](https://github.com/karminski)
 - [liulinboyi](https://github.com/liulinboyi)
+
+
+# 最后把代码转成JavaScript的AST然后使用[javascript的解释器canjs](https://github.com/jrainlau/canjs)执行代码.

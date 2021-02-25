@@ -1,10 +1,14 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Execute = void 0;
 const parser_1 = require("./parser");
 const Assignment_1 = require("./parser/Assignment");
 const Print_1 = require("./parser/Print");
 const Comment_1 = require("./parser/Comment");
+const index_js_1 = __importDefault(require("../vm/index.js"));
 let GlobalVariables = {
     Variables: {}
 };
@@ -18,10 +22,17 @@ function Execute(code) {
     let g = NewGlobalVariables();
     // parse
     ast = parser_1.parse(code);
+    for (let item in ast.body) {
+        if (ast.body[item].type === "COMMENT") { // 如果是注释，删除
+            ast.body.splice(item, 1);
+        }
+    }
     console.log(JSON.stringify(ast, null, 4), '\r\rAST');
     console.log("--------------------------------------------");
     // resolve
-    resolveAST(g, ast);
+    const vm = new index_js_1.default(ast);
+    vm.run();
+    // resolveAST(g, ast)
 }
 exports.Execute = Execute;
 function resolveAST(g, ast) {
@@ -55,15 +66,19 @@ function resolveAssignment(g, assignment) {
     if (varName == "") {
         throw new Error("resolveAssignment(): variable name can NOT be empty.");
     }
-    if (assignment.String !== null && assignment.String !== undefined) {
-        g.Variables[varName] = assignment.String;
-    }
-    else if (assignment.Number !== null && assignment.Number !== undefined) {
-        g.Variables[varName] = assignment.Number;
+    if (assignment.Literal) {
+        g.Variables[varName] = assignment.Literal.value;
     }
     else {
         throw new Error("Ivalie value.");
     }
+    // if (assignment.String !== null && assignment.String !== undefined) {
+    //     g.Variables[varName] = assignment.String
+    // } else if (assignment.Number !== null && assignment.Number !== undefined) {
+    //     g.Variables[varName] = assignment.Number
+    // } else {
+    //     throw new Error("Ivalie value.");
+    // }
     return null;
 }
 function resolvePrint(g, print) {

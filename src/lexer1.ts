@@ -8,11 +8,11 @@ Integer         ::= [0-9]+
 Number          ::= Integer Ignored
 String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
 Variable        ::= "$" Name Ignored // 变量 
-Assignment      ::= Variable Ignored '=' Ignored ( String | Number ) Ignored
+Assignment      ::= Variable Ignored '=' Ignored ( String | Number |  Variable) Ignored
 Print           ::= "print" "(" Ignored Variable Ignored ")" Ignored
 Statement       ::= Print | Assignment
 SourceCode      ::= Statement+ 
-Comment         ::= Ignored "#" SourceCharacter Ignored // 注释 
+Comment         ::= Ignored "#" SourceCharacter // 注释 
 
 */
 
@@ -96,7 +96,40 @@ export class Lexer {
         this.nextTokenType = nextTokenType;
         this.hasCache = false;
     }
+    /**
+     * LookAhead (向前看) 一个 Token, 告诉我们下一个 Token 是什么
+     * @returns
+     */
+    LookAhead(): { lineNum: number, tokenType: number, token: string } {
+        // lexer.nextToken already setted
+        if (this.hasCache) {
+            return { tokenType: this.nextTokenType, lineNum: this.lineNum, token: this.nextToken }
+            // return this.nextTokenType
+        }
+        // set it
+        // 当前行
+        let { lineNum, tokenType, token } = this.GetNextToken()
+        // *
+        // 下一行
+        this.hasCache = true
+        this.lineNum = lineNum
+        this.nextTokenType = tokenType
+        this.nextToken = token
+        return { tokenType, lineNum, token }
+    }
 
+    LookAheadAndSkip(expectedType: number) {
+        // get next token
+        // 查看看下一个Token信息
+        let { lineNum, tokenType, token } = this.GetNextToken()
+        // not is expected type, reverse cursor
+        if (tokenType != expectedType) {
+            this.hasCache = true
+            this.lineNum = lineNum
+            this.nextTokenType = tokenType
+            this.nextToken = token
+        }
+    }
     /**
     * 断言下一个 Token 是什么
     */
@@ -128,8 +161,22 @@ export class Lexer {
         }
         return this.MatchToken()
     }
+    checkCode(c: string) {
+        // 确保源代码，不包含非法字符，对应着SourceCharacter的EBNF
+        if (!/\u0009|\u000A|\u000D|[\u0020-\uFFFF]/.test(this.sourceCode[0])) {
+            throw new Error('The source code contains characters that cannot be parsed.')
+        }
+    }
+    // 直接跳过几个字符，返回被跳过的字符
+    next(skip: number) {
+        this.checkCode(this.sourceCode[0])
+        const code = this.sourceCode[0]
+        this.skipSourceCode(skip)
+        return code
+    }
     // 匹配Token并跳过匹配的Token
     MatchToken(): { lineNum: number, tokenType: number, token: string } {
+        this.checkCode(this.sourceCode[0]) // 只做检查，不吃字符
         // console.log(this.sourceCode[0], '当前Token')
         // check ignored
         if (this.isIgnored()) {
@@ -256,40 +303,6 @@ export class Lexer {
     }
     GetLineNum(): number {
         return this.lineNum
-    }
-    /**
-     * LookAhead (向前看) 一个 Token, 告诉我们下一个 Token 是什么
-     * @returns
-     */
-    LookAhead(): { lineNum: number, tokenType: number, token: string } {
-        // lexer.nextToken already setted
-        if (this.hasCache) {
-            return { tokenType: this.nextTokenType, lineNum: this.lineNum, token: this.nextToken }
-            // return this.nextTokenType
-        }
-        // set it
-        // 当前行
-        let { lineNum, tokenType, token } = this.GetNextToken()
-        // *
-        // 下一行
-        this.hasCache = true
-        this.lineNum = lineNum
-        this.nextTokenType = tokenType
-        this.nextToken = token
-        return { tokenType, lineNum, token }
-    }
-
-    LookAheadAndSkip(expectedType: number) {
-        // get next token
-        // 查看看下一个Token信息
-        let { lineNum, tokenType, token } = this.GetNextToken()
-        // not is expected type, reverse cursor
-        if (tokenType != expectedType) {
-            this.hasCache = true
-            this.lineNum = lineNum
-            this.nextTokenType = tokenType
-            this.nextToken = token
-        }
     }
     // return content before token
     scanBeforeToken(token: string): string {

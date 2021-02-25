@@ -3,6 +3,7 @@ import { GlobalVariables } from './definition'
 import { Assignment } from "./parser/Assignment"
 import { Print } from "./parser/Print"
 import { Comment } from "./parser/Comment"
+import Canjs from '../vm/index.js'
 
 let GlobalVariables: GlobalVariables = {
     Variables: {}
@@ -17,18 +18,26 @@ function NewGlobalVariables() {
 
 
 export function Execute(code: string) {
-    var ast = {}
+    var ast: any = {}
 
     let g = NewGlobalVariables()
 
     // parse
     ast = parse(code)
 
+    for (let item in ast.body) {
+        if (ast.body[item].type === "COMMENT") { // 如果是注释，删除
+            ast.body.splice(item, 1)
+        }
+    }
+
     console.log(JSON.stringify(ast, null, 4), '\r\rAST')
     console.log("--------------------------------------------")
 
     // resolve
-    resolveAST(g, ast)
+    const vm = new Canjs(ast);
+    vm.run()
+    // resolveAST(g, ast)
 }
 
 function resolveAST(g: any, ast: any) {
@@ -61,13 +70,18 @@ function resolveAssignment(g: any, assignment: any) {
     if (varName == "") {
         throw new Error("resolveAssignment(): variable name can NOT be empty.")
     }
-    if (assignment.String !== null && assignment.String !== undefined) {
-        g.Variables[varName] = assignment.String
-    } else if (assignment.Number !== null && assignment.Number !== undefined) {
-        g.Variables[varName] = assignment.Number
+    if (assignment.Literal) {
+        g.Variables[varName] = assignment.Literal.value
     } else {
         throw new Error("Ivalie value.");
     }
+    // if (assignment.String !== null && assignment.String !== undefined) {
+    //     g.Variables[varName] = assignment.String
+    // } else if (assignment.Number !== null && assignment.Number !== undefined) {
+    //     g.Variables[varName] = assignment.Number
+    // } else {
+    //     throw new Error("Ivalie value.");
+    // }
 
     return null
 }

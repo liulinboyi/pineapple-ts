@@ -1,8 +1,8 @@
 import { Lexer, NewLexer, tokenNameMap, Tokens } from "./lexer1"
 import { Variable } from './definition'
 import { paseComment } from './parser/Comment'
-import { parsePrint } from "./parser/Print"
-import { parseAssignment } from "./parser/Assignment"
+import { parsePrint, Print } from "./parser/Print"
+import { Assignment, parseAssignment } from "./parser/Assignment"
 
 export const { TOKEN_EOF,            // end-of-file
     TOKEN_VAR_PREFIX,         // $
@@ -21,13 +21,31 @@ export const { TOKEN_EOF,            // end-of-file
     SourceCharacter,          // 所有代码字符串
 } = Tokens
 
+export class Program {
+    constructor(type?: string, body?: Array<any>, LineNum?: number) {
+        this.type = 'Program'
+        this.body = body
+        this.LineNum = LineNum
+    }
+}
+
+export interface Program {
+    type?: string,
+    body?: Array<any>,
+    LineNum?: number
+}
+
 // SourceCode ::= Statement+ 
 function parseSourceCode(lexer: Lexer) {
 
+    let program: Program = new Program()
+
     let sourceCode: { LineNum?: number, Statements?: Array<Variable> } = {}
-    sourceCode.LineNum = lexer.GetLineNum()
-    sourceCode.Statements = parseStatements(lexer)
-    return sourceCode
+    // sourceCode.LineNum = lexer.GetLineNum()
+    // sourceCode.Statements = parseStatements(lexer)
+    program.LineNum = lexer.GetLineNum()
+    program.body = parseStatements(lexer)
+    return program
 }
 
 // Statement ::= Print | Assignment
@@ -36,7 +54,7 @@ function parseStatements(lexer: Lexer) {
 
     // 先调用LookAhead一次，将GetNextToken的结果缓存
     while (!isSourceCodeEnd(lexer.LookAhead().tokenType)) {
-        let statement = {}
+        let statement: Print | Assignment | Comment | undefined = {}
         statement = parseStatement(lexer)
         statements.push(statement)
     }
@@ -47,7 +65,7 @@ function parseStatement(lexer: Lexer) {
     // 向前看一个token并跳过
     lexer.LookAheadAndSkip(TOKEN_IGNORED) // skip if source code start with ignored token
     let look = lexer.LookAhead().tokenType
-    // console.log(look, 'look')
+    console.log(look, 'look')
     switch (look) {
         case TOKEN_PRINT:
             return parsePrint(lexer)
@@ -68,8 +86,8 @@ function isSourceCodeEnd(token: number): boolean {
 export function parseVariable(lexer: Lexer) {
     let variable: {
         LineNum?: number
-        Name?: string
-    } = {}
+        Name: string
+    } = { Name: '' }
 
     variable.LineNum = lexer.GetLineNum()
     lexer.NextTokenIs(TOKEN_VAR_PREFIX)
@@ -96,12 +114,12 @@ export function parseNumber(lexer: Lexer) {
 
         while (lexer.isNumber(lexer.sourceCode[0])) {
             // console.log(lexer.sourceCode[0])
-            str = lexer.sourceCode[0];
-            lexer.skipSourceCode(1);
+            str = lexer.next(1)
         }
         if (!lexer.isIgnored()) {
             throw new Error('Uncaught SyntaxError: Invalid or unexpected token')
         }
+        lexer.NextTokenIs(NUMBER)
 
         lexer.LookAheadAndSkip(TOKEN_IGNORED)
     }

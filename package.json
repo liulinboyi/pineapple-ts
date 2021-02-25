@@ -5,6 +5,7 @@
     "typescript": "^4.1.3"
   },
   "scripts": {
-    "test": "ts-node ./examples/pineapple/main.ts ./examples/pineapple/hello-world.pineapple"
+    "test": "ts-node ./examples/pineapple/main.ts ./examples/pineapple/hello-world.pineapple",
+    "build": "rm -rf ./dist/ && tsc"
   }
 }
