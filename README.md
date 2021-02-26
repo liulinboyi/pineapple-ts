@@ -10,13 +10,14 @@ Integer         ::= [0-9]+
 Number          ::= Integer Ignored
 String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
 Variable        ::= "$" Name Ignored // 变量 
-Assignment      ::= Variable Ignored '=' Ignored ( String | Number |  Variable) Ignored
+Assignment      ::= Variable Ignored '=' Ignored ( String | Number |  Variable | BinaryExpression) Ignored
 Print           ::= "print" "(" Ignored Variable Ignored ")" Ignored
 Statement       ::= Print | Assignment
 SourceCode      ::= Statement+ 
 Comment         ::= Ignored "#" SourceCharacter // 注释 
-Expression      ::= Variable Ignored Operator Ignored Variable
+BinaryExpression::= (Variable | Number) Ignored Operator Ignored (Variable | Number)
 Operator        ::= "+" | "-" | "*" | "/"
+BinaryExpressions ::= (BinaryExpression Operator)+ Ignored (Variable | Number) // eg: 1: (2 + 1 +) 3   2: ((2 + 1 +) (5 + 6 -)) 3
 
 ```
 
