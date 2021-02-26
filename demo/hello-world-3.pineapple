@@ -1,4 +1,4 @@
 $b = 1
-$d = $b - 1
+$d = $b - $b
 print($b)
 print($d)

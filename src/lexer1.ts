@@ -8,11 +8,14 @@ Integer         ::= [0-9]+
 Number          ::= Integer Ignored
 String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
 Variable        ::= "$" Name Ignored // 变量 
-Assignment      ::= Variable Ignored '=' Ignored ( String | Number |  Variable) Ignored
+Assignment      ::= Variable Ignored '=' Ignored ( String | Number |  Variable | BinaryExpression) Ignored
 Print           ::= "print" "(" Ignored Variable Ignored ")" Ignored
 Statement       ::= Print | Assignment
 SourceCode      ::= Statement+ 
 Comment         ::= Ignored "#" SourceCharacter // 注释 
+BinaryExpression::= (Variable | Number) Ignored Operator Ignored (Variable | Number)
+Operator        ::= "+" | "-" | "*" | "/"
+BinaryExpressions ::= (BinaryExpression Operator)+ Ignored (Variable | Number) // eg: 1: (2 + 1 +) 3   2: ((2 + 1 +) (5 + 6 -)) 3
 
 */
 
@@ -43,9 +46,10 @@ export enum Tokens {
     STRING,                   // String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
     COMMENT,                  // Ignored "#" SourceCharacter Ignored
     SourceCharacter,          // 所有代码字符串
+    Operator,                 // +-*/ Operator
 }
 
-const { TOKEN_EOF,            // end-of-file
+export const { TOKEN_EOF,            // end-of-file
     TOKEN_VAR_PREFIX,         // $
     TOKEN_LEFT_PAREN,         // (
     TOKEN_RIGHT_PAREN,        // )
@@ -60,6 +64,7 @@ const { TOKEN_EOF,            // end-of-file
     STRING,                   // String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
     COMMENT,                  // Ignored "#" SourceCharacter Ignored
     SourceCharacter,          // 所有代码字符串
+    Operator,                 // +-*/ Operator
 } = Tokens
 
 // regex match patterns
@@ -86,6 +91,7 @@ export const tokenNameMap: TokenNameMap = {
     [STRING]: "STRING",
     [COMMENT]: "COMMENT",
     [SourceCharacter]: "SourceCharacter",
+    [Operator]: "Operator",
 }
 
 export class Lexer {
@@ -215,6 +221,12 @@ export class Lexer {
                 this.skipSourceCode(1)
                 return { lineNum: this.lineNum, tokenType: COMMENT, token: "#" }
         }
+        // Operator
+        if (/\+|\-|\*|\//.test(this.sourceCode[0])) {
+            const op = this.sourceCode[0]
+            this.skipSourceCode(1)
+            return { lineNum: this.lineNum, tokenType: Operator, token: op }
+        }
         // check multiple character token
         if (this.sourceCode[0] == '_' || this.isLetter(this.sourceCode[0])) {
             // 扫描关键字
@@ -228,7 +240,9 @@ export class Lexer {
             }
         }
         if (this.isNumber(this.sourceCode[0])) {
-            return { lineNum: this.lineNum, tokenType: NUMBER, token: this.sourceCode[0] }
+            const num = this.sourceCode[0]
+            this.skipSourceCode(1)
+            return { lineNum: this.lineNum, tokenType: NUMBER, token: num }
         }
         // unexpected symbol
         throw new Error(`MatchToken(): unexpected symbol near '${this.sourceCode[0]}'.`);

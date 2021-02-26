@@ -1,25 +1,9 @@
-import { Lexer, NewLexer, tokenNameMap, Tokens } from "./lexer1"
+import { COMMENT, Lexer, NewLexer, NUMBER, tokenNameMap, TOKEN_DUOQUOTE, TOKEN_EOF, TOKEN_IGNORED, TOKEN_NAME, TOKEN_PRINT, TOKEN_QUOTE, TOKEN_VAR_PREFIX } from "./lexer1"
 import { Variable } from './definition'
 import { paseComment } from './parser/Comment'
 import { parsePrint, Print } from "./parser/Print"
 import { Assignment, parseAssignment } from "./parser/Assignment"
 
-export const { TOKEN_EOF,            // end-of-file
-    TOKEN_VAR_PREFIX,         // $
-    TOKEN_LEFT_PAREN,         // (
-    TOKEN_RIGHT_PAREN,        // )
-    TOKEN_EQUAL,              // =
-    TOKEN_QUOTE,              // "
-    TOKEN_DUOQUOTE,           // ""
-    TOKEN_NAME,               // Name ::= [_A-Za-z][_0-9A-Za-z]*
-    TOKEN_PRINT,              // print
-    TOKEN_IGNORED,            // Ignored  
-    INTERGER,                 // [0-9]+
-    NUMBER,                   // Integer Ignored
-    STRING,                   // String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
-    COMMENT,                  // Ignored "#" SourceCharacter Ignored
-    SourceCharacter,          // 所有代码字符串
-} = Tokens
 
 export class Program {
     constructor(type?: string, body?: Array<any>, LineNum?: number) {
@@ -107,18 +91,18 @@ function parseName(lexer: Lexer) {
 // Number          ::= Integer Ignored
 export function parseNumber(lexer: Lexer) {
     let str = ""
-    let { tokenType, token } = lexer.MatchToken()
+    let { tokenType, token } = lexer.LookAhead()
     str += token
     // console.log(tokenType, 'parseNumber', str, 'str')
     if (tokenType === NUMBER) {
 
         while (lexer.isNumber(lexer.sourceCode[0])) {
             // console.log(lexer.sourceCode[0])
-            str = lexer.next(1)
+            str += lexer.next(1)
         }
-        if (!lexer.isIgnored()) {
-            throw new Error('Uncaught SyntaxError: Invalid or unexpected token')
-        }
+        // if (!lexer.isIgnored()) {
+        //     throw new Error('Uncaught SyntaxError: Invalid or unexpected token')
+        // }
         lexer.NextTokenIs(NUMBER)
 
         lexer.LookAheadAndSkip(TOKEN_IGNORED)

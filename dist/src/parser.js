@@ -1,11 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parse = exports.parseString = exports.parseNumber = exports.parseVariable = exports.Program = exports.SourceCharacter = exports.COMMENT = exports.STRING = exports.NUMBER = exports.INTERGER = exports.TOKEN_IGNORED = exports.TOKEN_PRINT = exports.TOKEN_NAME = exports.TOKEN_DUOQUOTE = exports.TOKEN_QUOTE = exports.TOKEN_EQUAL = exports.TOKEN_RIGHT_PAREN = exports.TOKEN_LEFT_PAREN = exports.TOKEN_VAR_PREFIX = exports.TOKEN_EOF = void 0;
+exports.parse = exports.parseString = exports.parseNumber = exports.parseVariable = exports.Program = void 0;
 const lexer1_1 = require("./lexer1");
 const Comment_1 = require("./parser/Comment");
 const Print_1 = require("./parser/Print");
 const Assignment_1 = require("./parser/Assignment");
-exports.TOKEN_EOF = lexer1_1.Tokens.TOKEN_EOF, exports.TOKEN_VAR_PREFIX = lexer1_1.Tokens.TOKEN_VAR_PREFIX, exports.TOKEN_LEFT_PAREN = lexer1_1.Tokens.TOKEN_LEFT_PAREN, exports.TOKEN_RIGHT_PAREN = lexer1_1.Tokens.TOKEN_RIGHT_PAREN, exports.TOKEN_EQUAL = lexer1_1.Tokens.TOKEN_EQUAL, exports.TOKEN_QUOTE = lexer1_1.Tokens.TOKEN_QUOTE, exports.TOKEN_DUOQUOTE = lexer1_1.Tokens.TOKEN_DUOQUOTE, exports.TOKEN_NAME = lexer1_1.Tokens.TOKEN_NAME, exports.TOKEN_PRINT = lexer1_1.Tokens.TOKEN_PRINT, exports.TOKEN_IGNORED = lexer1_1.Tokens.TOKEN_IGNORED, exports.INTERGER = lexer1_1.Tokens.INTERGER, exports.NUMBER = lexer1_1.Tokens.NUMBER, exports.STRING = lexer1_1.Tokens.STRING, exports.COMMENT = lexer1_1.Tokens.COMMENT, exports.SourceCharacter = lexer1_1.Tokens.SourceCharacter;
 class Program {
     constructor(type, body, LineNum) {
         this.type = 'Program';
@@ -37,55 +36,55 @@ function parseStatements(lexer) {
 }
 function parseStatement(lexer) {
     // 向前看一个token并跳过
-    lexer.LookAheadAndSkip(exports.TOKEN_IGNORED); // skip if source code start with ignored token
+    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // skip if source code start with ignored token
     let look = lexer.LookAhead().tokenType;
     console.log(look, 'look');
     switch (look) {
-        case exports.TOKEN_PRINT:
+        case lexer1_1.TOKEN_PRINT:
             return Print_1.parsePrint(lexer);
-        case exports.TOKEN_VAR_PREFIX:
+        case lexer1_1.TOKEN_VAR_PREFIX:
             return Assignment_1.parseAssignment(lexer);
-        case exports.COMMENT:
+        case lexer1_1.COMMENT:
             return Comment_1.paseComment(lexer);
         default:
             throw new Error("parseStatement(): unknown Statement.");
     }
 }
 function isSourceCodeEnd(token) {
-    return token === exports.TOKEN_EOF;
+    return token === lexer1_1.TOKEN_EOF;
 }
 // Variable ::= "$" Name Ignored
 function parseVariable(lexer) {
     let variable = { Name: '' };
     variable.LineNum = lexer.GetLineNum();
-    lexer.NextTokenIs(exports.TOKEN_VAR_PREFIX);
+    lexer.NextTokenIs(lexer1_1.TOKEN_VAR_PREFIX);
     variable.Name = parseName(lexer);
-    lexer.LookAheadAndSkip(exports.TOKEN_IGNORED);
+    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
     return variable;
 }
 exports.parseVariable = parseVariable;
 // Name ::= [_A-Za-z][_0-9A-Za-z]*
 function parseName(lexer) {
-    let { nowLineNum: _, nowToken: name } = lexer.NextTokenIs(exports.TOKEN_NAME);
+    let { nowLineNum: _, nowToken: name } = lexer.NextTokenIs(lexer1_1.TOKEN_NAME);
     return name;
 }
 // Integer         ::= [0-9]+
 // Number          ::= Integer Ignored
 function parseNumber(lexer) {
     let str = "";
-    let { tokenType, token } = lexer.MatchToken();
+    let { tokenType, token } = lexer.LookAhead();
     str += token;
     // console.log(tokenType, 'parseNumber', str, 'str')
-    if (tokenType === exports.NUMBER) {
+    if (tokenType === lexer1_1.NUMBER) {
         while (lexer.isNumber(lexer.sourceCode[0])) {
             // console.log(lexer.sourceCode[0])
-            str = lexer.next(1);
+            str += lexer.next(1);
         }
-        if (!lexer.isIgnored()) {
-            throw new Error('Uncaught SyntaxError: Invalid or unexpected token');
-        }
-        lexer.NextTokenIs(exports.NUMBER);
-        lexer.LookAheadAndSkip(exports.TOKEN_IGNORED);
+        // if (!lexer.isIgnored()) {
+        //     throw new Error('Uncaught SyntaxError: Invalid or unexpected token')
+        // }
+        lexer.NextTokenIs(lexer1_1.NUMBER);
+        lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
     }
     return +str;
 }
@@ -95,15 +94,15 @@ function parseString(lexer) {
     let str = "";
     let look = lexer.LookAhead().tokenType;
     switch (look) {
-        case exports.TOKEN_DUOQUOTE:
-            lexer.NextTokenIs(exports.TOKEN_DUOQUOTE);
-            lexer.LookAheadAndSkip(exports.TOKEN_IGNORED);
+        case lexer1_1.TOKEN_DUOQUOTE:
+            lexer.NextTokenIs(lexer1_1.TOKEN_DUOQUOTE);
+            lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
             return str;
-        case exports.TOKEN_QUOTE:
-            lexer.NextTokenIs(exports.TOKEN_QUOTE); // 这里已经吃掉一个单个双引号了
-            str = lexer.scanBeforeToken(lexer1_1.tokenNameMap[exports.TOKEN_QUOTE]); // 这里就会成这样了 eg: aa"后面其他字符串
-            lexer.NextTokenIs(exports.TOKEN_QUOTE);
-            lexer.LookAheadAndSkip(exports.TOKEN_IGNORED);
+        case lexer1_1.TOKEN_QUOTE:
+            lexer.NextTokenIs(lexer1_1.TOKEN_QUOTE); // 这里已经吃掉一个单个双引号了
+            str = lexer.scanBeforeToken(lexer1_1.tokenNameMap[lexer1_1.TOKEN_QUOTE]); // 这里就会成这样了 eg: aa"后面其他字符串
+            lexer.NextTokenIs(lexer1_1.TOKEN_QUOTE);
+            lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
             return str;
         default:
             return "";
@@ -113,7 +112,7 @@ exports.parseString = parseString;
 function parse(code) {
     let lexer = lexer1_1.NewLexer(code);
     let sourceCode = parseSourceCode(lexer);
-    lexer.NextTokenIs(exports.TOKEN_EOF);
+    lexer.NextTokenIs(lexer1_1.TOKEN_EOF);
     // console.log(JSON.stringify(sourceCode), 'sourceCode')
     return sourceCode;
 }

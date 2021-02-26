@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NewLexer = exports.Lexer = exports.tokenNameMap = exports.keywords = exports.Tokens = void 0;
+exports.NewLexer = exports.Lexer = exports.tokenNameMap = exports.keywords = exports.Operator = exports.SourceCharacter = exports.COMMENT = exports.STRING = exports.NUMBER = exports.INTERGER = exports.TOKEN_IGNORED = exports.TOKEN_PRINT = exports.TOKEN_NAME = exports.TOKEN_DUOQUOTE = exports.TOKEN_QUOTE = exports.TOKEN_EQUAL = exports.TOKEN_RIGHT_PAREN = exports.TOKEN_LEFT_PAREN = exports.TOKEN_VAR_PREFIX = exports.TOKEN_EOF = exports.Tokens = void 0;
 // token const
 var Tokens;
 (function (Tokens) {
@@ -19,44 +19,32 @@ var Tokens;
     Tokens[Tokens["STRING"] = 12] = "STRING";
     Tokens[Tokens["COMMENT"] = 13] = "COMMENT";
     Tokens[Tokens["SourceCharacter"] = 14] = "SourceCharacter";
+    Tokens[Tokens["Operator"] = 15] = "Operator";
 })(Tokens = exports.Tokens || (exports.Tokens = {}));
-const { TOKEN_EOF, // end-of-file
-TOKEN_VAR_PREFIX, // $
-TOKEN_LEFT_PAREN, // (
-TOKEN_RIGHT_PAREN, // )
-TOKEN_EQUAL, // =
-TOKEN_QUOTE, // "
-TOKEN_DUOQUOTE, // ""
-TOKEN_NAME, // Name ::= [_A-Za-z][_0-9A-Za-z]*
-TOKEN_PRINT, // print
-TOKEN_IGNORED, // Ignored  
-INTERGER, // [0-9]+
-NUMBER, // Integer Ignored
-STRING, // String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
-COMMENT, // Ignored "#" SourceCharacter Ignored
-SourceCharacter, } = Tokens;
+exports.TOKEN_EOF = Tokens.TOKEN_EOF, exports.TOKEN_VAR_PREFIX = Tokens.TOKEN_VAR_PREFIX, exports.TOKEN_LEFT_PAREN = Tokens.TOKEN_LEFT_PAREN, exports.TOKEN_RIGHT_PAREN = Tokens.TOKEN_RIGHT_PAREN, exports.TOKEN_EQUAL = Tokens.TOKEN_EQUAL, exports.TOKEN_QUOTE = Tokens.TOKEN_QUOTE, exports.TOKEN_DUOQUOTE = Tokens.TOKEN_DUOQUOTE, exports.TOKEN_NAME = Tokens.TOKEN_NAME, exports.TOKEN_PRINT = Tokens.TOKEN_PRINT, exports.TOKEN_IGNORED = Tokens.TOKEN_IGNORED, exports.INTERGER = Tokens.INTERGER, exports.NUMBER = Tokens.NUMBER, exports.STRING = Tokens.STRING, exports.COMMENT = Tokens.COMMENT, exports.SourceCharacter = Tokens.SourceCharacter, exports.Operator = Tokens.Operator;
 // regex match patterns
 const regexName = /^[_\d\w]+/;
 // 关键字
 exports.keywords = {
-    "print": TOKEN_PRINT,
+    "print": exports.TOKEN_PRINT,
 };
 exports.tokenNameMap = {
-    [TOKEN_EOF]: "EOF",
-    [TOKEN_VAR_PREFIX]: "$",
-    [TOKEN_LEFT_PAREN]: "(",
-    [TOKEN_RIGHT_PAREN]: ")",
-    [TOKEN_EQUAL]: "=",
-    [TOKEN_QUOTE]: "\"",
-    [TOKEN_DUOQUOTE]: "\"\"",
-    [TOKEN_NAME]: "Name",
-    [TOKEN_PRINT]: "print",
-    [TOKEN_IGNORED]: "Ignored",
-    [INTERGER]: "INTERGER",
-    [NUMBER]: "NUMBER",
-    [STRING]: "STRING",
-    [COMMENT]: "COMMENT",
-    [SourceCharacter]: "SourceCharacter",
+    [exports.TOKEN_EOF]: "EOF",
+    [exports.TOKEN_VAR_PREFIX]: "$",
+    [exports.TOKEN_LEFT_PAREN]: "(",
+    [exports.TOKEN_RIGHT_PAREN]: ")",
+    [exports.TOKEN_EQUAL]: "=",
+    [exports.TOKEN_QUOTE]: "\"",
+    [exports.TOKEN_DUOQUOTE]: "\"\"",
+    [exports.TOKEN_NAME]: "Name",
+    [exports.TOKEN_PRINT]: "print",
+    [exports.TOKEN_IGNORED]: "Ignored",
+    [exports.INTERGER]: "INTERGER",
+    [exports.NUMBER]: "NUMBER",
+    [exports.STRING]: "STRING",
+    [exports.COMMENT]: "COMMENT",
+    [exports.SourceCharacter]: "SourceCharacter",
+    [exports.Operator]: "Operator",
 };
 class Lexer {
     constructor(sourceCode, lineNum, nextToken, nextTokenType, nextTokenLineNum) {
@@ -146,11 +134,11 @@ class Lexer {
         // console.log(this.sourceCode[0], '当前Token')
         // check ignored
         if (this.isIgnored()) {
-            return { lineNum: this.lineNum, tokenType: TOKEN_IGNORED, token: "Ignored" };
+            return { lineNum: this.lineNum, tokenType: exports.TOKEN_IGNORED, token: "Ignored" };
         }
         // finish
         if (this.sourceCode.length == 0) {
-            return { lineNum: this.lineNum, tokenType: TOKEN_EOF, token: exports.tokenNameMap[TOKEN_EOF] };
+            return { lineNum: this.lineNum, tokenType: exports.TOKEN_EOF, token: exports.tokenNameMap[exports.TOKEN_EOF] };
         }
         // 如果nextTokenType是#，并且字符串能匹配上，则表示是源代码字符串
         // if (this.sourceCode[0].match(/\*/)) {
@@ -160,26 +148,32 @@ class Lexer {
         switch (this.sourceCode[0]) {
             case '$':
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: TOKEN_VAR_PREFIX, token: "$" };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_VAR_PREFIX, token: "$" };
             case '(':
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: TOKEN_LEFT_PAREN, token: "(" };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_LEFT_PAREN, token: "(" };
             case ')':
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: TOKEN_RIGHT_PAREN, token: ")" };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_RIGHT_PAREN, token: ")" };
             case '=':
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: TOKEN_EQUAL, token: "=" };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_EQUAL, token: "=" };
             case '"':
                 if (this.nextSourceCodeIs("\"\"")) {
                     this.skipSourceCode(2);
-                    return { lineNum: this.lineNum, tokenType: TOKEN_DUOQUOTE, token: "\"\"" };
+                    return { lineNum: this.lineNum, tokenType: exports.TOKEN_DUOQUOTE, token: "\"\"" };
                 }
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: TOKEN_QUOTE, token: "\"" };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_QUOTE, token: "\"" };
             case '#':
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: COMMENT, token: "#" };
+                return { lineNum: this.lineNum, tokenType: exports.COMMENT, token: "#" };
+        }
+        // Operator
+        if (/\+|\-|\*|\//.test(this.sourceCode[0])) {
+            const op = this.sourceCode[0];
+            this.skipSourceCode(1);
+            return { lineNum: this.lineNum, tokenType: exports.Operator, token: op };
         }
         // check multiple character token
         if (this.sourceCode[0] == '_' || this.isLetter(this.sourceCode[0])) {
@@ -191,11 +185,13 @@ class Lexer {
                 return { lineNum: this.lineNum, tokenType, token };
             }
             else {
-                return { lineNum: this.lineNum, tokenType: TOKEN_NAME, token };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_NAME, token };
             }
         }
         if (this.isNumber(this.sourceCode[0])) {
-            return { lineNum: this.lineNum, tokenType: NUMBER, token: this.sourceCode[0] };
+            const num = this.sourceCode[0];
+            this.skipSourceCode(1);
+            return { lineNum: this.lineNum, tokenType: exports.NUMBER, token: num };
         }
         // unexpected symbol
         throw new Error(`MatchToken(): unexpected symbol near '${this.sourceCode[0]}'.`);

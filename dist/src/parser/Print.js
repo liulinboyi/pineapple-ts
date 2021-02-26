@@ -15,14 +15,14 @@ exports.Print = Print;
 function parsePrint(lexer) {
     let print = new Print();
     print.LineNum = lexer.GetLineNum();
-    lexer.NextTokenIs(parser_1.TOKEN_PRINT);
-    lexer.NextTokenIs(parser_1.TOKEN_LEFT_PAREN);
-    lexer.LookAheadAndSkip(parser_1.TOKEN_IGNORED);
+    lexer.NextTokenIs(lexer1_1.TOKEN_PRINT);
+    lexer.NextTokenIs(lexer1_1.TOKEN_LEFT_PAREN);
+    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
     print.Variable = parser_1.parseVariable(lexer);
-    print.type = lexer1_1.tokenNameMap[parser_1.TOKEN_PRINT];
-    lexer.LookAheadAndSkip(parser_1.TOKEN_IGNORED);
-    lexer.NextTokenIs(parser_1.TOKEN_RIGHT_PAREN);
-    lexer.LookAheadAndSkip(parser_1.TOKEN_IGNORED);
+    print.type = lexer1_1.tokenNameMap[lexer1_1.TOKEN_PRINT];
+    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
+    lexer.NextTokenIs(lexer1_1.TOKEN_RIGHT_PAREN);
+    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
     const p = {
         "type": "ExpressionStatement",
         "expression": {

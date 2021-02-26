@@ -1,0 +1,12 @@
+$a = 10
+$b = $a-    5
+$d = 3    -2
+$c = 25    -      $a
+$e = 100 * 100
+$f = 1/2
+print($a)
+print($b)
+print($d)
+print($c)
+print($e)
+print($f)
