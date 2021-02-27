@@ -1,6 +1,7 @@
-import { TOKEN_IGNORED, TOKEN_LEFT_PAREN, Lexer, TOKEN_RIGHT_PAREN, TOKEN_FUNC_PARAMS_DIV, TOKEN_FUNC, BLOCK_START, TOKEN_RETURN, NUMBER, TOKEN_VAR_PREFIX, Operator, BLOCK_END, TOKEN_PRINT } from "../lexer1";
+import { TOKEN_IGNORED, TOKEN_LEFT_PAREN, Lexer, TOKEN_RIGHT_PAREN, TOKEN_FUNC_PARAMS_DIV, TOKEN_FUNC, BLOCK_START, TOKEN_RETURN, NUMBER, TOKEN_VAR_PREFIX, Operator, BLOCK_END, TOKEN_PRINT, TOKEN_IF } from "../lexer1";
 import { parseName, parseNumber, parseString, parseVariable } from "../parser";
 import { Assignment, Identifier, Literal, parseAssignment, parseBinaryExpression } from "./Assignment";
+import { parseIfStatement } from "./IfStatement";
 import { parsePrint } from "./Print";
 
 export function parseFunction(lexer: Lexer) {
@@ -58,16 +59,17 @@ export function parseFunction(lexer: Lexer) {
     lexer.NextTokenIs(TOKEN_RIGHT_PAREN) // )
     lexer.LookAheadAndSkip(TOKEN_IGNORED) // 去除空格回车等
 
-    lexer.NextTokenIs(BLOCK_START)
+    lexer.NextTokenIs(BLOCK_START) // {
     lexer.LookAheadAndSkip(TOKEN_IGNORED) // 去除空格回车等
-    const block = paseBlock(lexer)
+    const BlockStatementBody: any[] = []
+    const block = paseBlock(lexer, BlockStatementBody)
     FunctionDeclaration.body.body = block
-    lexer.NextTokenIs(BLOCK_END)
+    lexer.NextTokenIs(BLOCK_END) // }
     lexer.LookAheadAndSkip(TOKEN_IGNORED)
     return FunctionDeclaration
 }
-const BlockStatementBody: any[] = []
-export function paseBlock(lexer: Lexer) {
+
+export function paseBlock(lexer: Lexer, BlockStatementBody: any) {
     const ahead = lexer.LookAhead()
     if (ahead.tokenType === TOKEN_RETURN) { // return
         lexer.NextTokenIs(TOKEN_RETURN)
@@ -87,12 +89,17 @@ export function paseBlock(lexer: Lexer) {
             declarations: VariableDeclaration.declarations,
             kind: VariableDeclaration.kind
         })
-        paseBlock(lexer)
+        paseBlock(lexer, BlockStatementBody)
     } else if (ahead.tokenType === TOKEN_PRINT) {
         const print = parsePrint(lexer)
         console.log(print)
         BlockStatementBody.push(print)
-        paseBlock(lexer)
+        paseBlock(lexer, BlockStatementBody)
+    } else if (ahead.tokenType === TOKEN_IF) {
+        const IfStatement = parseIfStatement(lexer)
+        console.log(IfStatement)
+        BlockStatementBody.push(IfStatement)
+        paseBlock(lexer, BlockStatementBody)
     }
     return BlockStatementBody
 }

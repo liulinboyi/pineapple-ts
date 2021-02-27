@@ -4,6 +4,7 @@ exports.paseReturnStatement = exports.paseBlock = exports.parseFunction = void 0
 const lexer1_1 = require("../lexer1");
 const parser_1 = require("../parser");
 const Assignment_1 = require("./Assignment");
+const IfStatement_1 = require("./IfStatement");
 const Print_1 = require("./Print");
 function parseFunction(lexer) {
     const FunctionDeclaration = {
@@ -56,17 +57,17 @@ function parseFunction(lexer) {
     }
     lexer.NextTokenIs(lexer1_1.TOKEN_RIGHT_PAREN); // )
     lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 去除空格回车等
-    lexer.NextTokenIs(lexer1_1.BLOCK_START);
+    lexer.NextTokenIs(lexer1_1.BLOCK_START); // {
     lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 去除空格回车等
-    const block = paseBlock(lexer);
+    const BlockStatementBody = [];
+    const block = paseBlock(lexer, BlockStatementBody);
     FunctionDeclaration.body.body = block;
-    lexer.NextTokenIs(lexer1_1.BLOCK_END);
+    lexer.NextTokenIs(lexer1_1.BLOCK_END); // }
     lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
     return FunctionDeclaration;
 }
 exports.parseFunction = parseFunction;
-const BlockStatementBody = [];
-function paseBlock(lexer) {
+function paseBlock(lexer, BlockStatementBody) {
     const ahead = lexer.LookAhead();
     if (ahead.tokenType === lexer1_1.TOKEN_RETURN) { // return
         lexer.NextTokenIs(lexer1_1.TOKEN_RETURN);
@@ -87,13 +88,19 @@ function paseBlock(lexer) {
             declarations: VariableDeclaration.declarations,
             kind: VariableDeclaration.kind
         });
-        paseBlock(lexer);
+        paseBlock(lexer, BlockStatementBody);
     }
     else if (ahead.tokenType === lexer1_1.TOKEN_PRINT) {
         const print = Print_1.parsePrint(lexer);
         console.log(print);
         BlockStatementBody.push(print);
-        paseBlock(lexer);
+        paseBlock(lexer, BlockStatementBody);
+    }
+    else if (ahead.tokenType === lexer1_1.TOKEN_IF) {
+        const IfStatement = IfStatement_1.parseIfStatement(lexer);
+        console.log(IfStatement);
+        BlockStatementBody.push(IfStatement);
+        paseBlock(lexer, BlockStatementBody);
     }
     return BlockStatementBody;
 }

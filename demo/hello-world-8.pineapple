@@ -1,0 +1,13 @@
+
+func add($a,$b) {
+	if ($a >= 1) {
+		return $a
+	}
+	$_a = $a + $b
+	print($_a)
+	return $_a + 1
+}
+
+$res = add(1,2)
+
+print($res)

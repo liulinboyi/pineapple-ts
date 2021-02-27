@@ -14,12 +14,13 @@ Statement       ::= Print | Assignment
 SourceCode      ::= Statement+ 
 Comment         ::= Ignored "#" SourceCharacter // 注释 
 BinaryExpression::= (Variable | Number) Ignored Operator Ignored (Variable | Number)
-Operator        ::= "+" | "-" | "*" | "/"
+Operator        ::= "+" | "-" | "*" | "/" | ">" | "<" | "==" | ">=" | "<="
 BinaryExpressions ::= (BinaryExpression Operator)+ Ignored (Variable | Number) // eg: 1: (2 + 1 +) 3   2: ((2 + 1 +) (5 + 6 -)) 3
 FunctionDeclaration ::= "func" Ignored Name Ignored "(" Variable ("," Variable)* ")" BlockStatement // eg: 1: func foo ($a) {}  2: func foo ($a[,$b][,$c]) {}   ("," Variable)*这部分是一个或多个
-BlockStatement  ::= "{" Ignored ReturnStatement Ignored "}"
-ReturnStatement ::= "return" BinaryExpression
+BlockStatement  ::= "{" Ignored (IfStatement | Print | Assignment | ReturnStatement ) Ignored "}"
+ReturnStatement ::= "return" (BinaryExpression | Variable)
 CallFunction    ::= Name "(" (Variable | Number) ("," (Variable | Number))* ")" Ignored
+IfStatement     ::= "if" Ignored "(" Variable Ignored Operator Ignored Variable ")" Ignored BlockStatement Ignored "else" Ignored BlockStatement Ignored
 
 */
 
@@ -51,14 +52,16 @@ export enum Tokens {
     COMMENT,                  // Ignored "#" SourceCharacter Ignored
     SourceCharacter,          // 所有代码字符串
     Operator,                 // +-*/ Operator
-    TOKEN_FUNC,        // func
+    TOKEN_FUNC,               // func
     BLOCK_START,              // {
     BLOCK_END,                // }
     TOKEN_RETURN,             // return
-    TOKEN_FUNC_PARAMS_DIV     // ,
+    TOKEN_FUNC_PARAMS_DIV,     // ,
+    TOKEN_IF,                  // if
 }
 
-export const { TOKEN_EOF,            // end-of-file
+export const {
+    TOKEN_EOF,                // end-of-file
     TOKEN_VAR_PREFIX,         // $
     TOKEN_LEFT_PAREN,         // (
     TOKEN_RIGHT_PAREN,        // )
@@ -74,11 +77,12 @@ export const { TOKEN_EOF,            // end-of-file
     COMMENT,                  // Ignored "#" SourceCharacter Ignored
     SourceCharacter,          // 所有代码字符串
     Operator,                 // +-*/ Operator
-    TOKEN_FUNC,        // func
+    TOKEN_FUNC,               // func
     BLOCK_START,              // {
     BLOCK_END,                // }
     TOKEN_RETURN,             // return
     TOKEN_FUNC_PARAMS_DIV,    // ,
+    TOKEN_IF,                  // if
 } = Tokens
 
 // regex match patterns
@@ -87,6 +91,7 @@ const regexName = /^[_\d\w]+/
 // 关键字
 export const keywords: Keywords = {
     "print": TOKEN_PRINT,
+    "if": TOKEN_IF,
 }
 
 export const tokenNameMap: TokenNameMap = {
@@ -111,6 +116,7 @@ export const tokenNameMap: TokenNameMap = {
     [BLOCK_END]: "BLOCK_END",
     [TOKEN_RETURN]: "TOKEN_RETURN",
     [TOKEN_FUNC_PARAMS_DIV]: "TOKEN_FUNC_PARAMS_DIV",
+    [TOKEN_IF]: "if",
 }
 
 export class Lexer {
@@ -260,10 +266,23 @@ export class Lexer {
             return { lineNum: this.lineNum, tokenType: TOKEN_FUNC, token: "func" }
         }
         // Operator
-        if (/\+|\-|\*|\//.test(this.sourceCode[0])) {
-            const op = this.sourceCode[0]
+        const regexpResult = /\+|\-|\*|\//.exec(this.sourceCode[0])
+        if (regexpResult) {
+            const op = regexpResult[0]
             this.skipSourceCode(1)
             return { lineNum: this.lineNum, tokenType: Operator, token: op }
+        }
+        // Compare > < = >= <= ==
+        const Compare = /\>|\<|\=/.exec(this.sourceCode[0])
+        if (Compare) {
+            const co = Compare[0]
+            this.skipSourceCode(1)
+            if (this.sourceCode[0] === "=") {
+                this.skipSourceCode(1)
+                return { lineNum: this.lineNum, tokenType: Operator, token: `${co}=` }
+            } else {
+                return { lineNum: this.lineNum, tokenType: Operator, token: co }
+            }
         }
         // check multiple character token
         if (this.sourceCode[0] == '_' || this.isLetter(this.sourceCode[0])) {

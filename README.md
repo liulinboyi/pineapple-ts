@@ -16,12 +16,13 @@ Statement       ::= Print | Assignment
 SourceCode      ::= Statement+ 
 Comment         ::= Ignored "#" SourceCharacter // 注释 
 BinaryExpression::= (Variable | Number) Ignored Operator Ignored (Variable | Number)
-Operator        ::= "+" | "-" | "*" | "/"
+Operator        ::= "+" | "-" | "*" | "/" | ">" | "<" | "==" | ">=" | "<="
 BinaryExpressions ::= (BinaryExpression Operator)+ Ignored (Variable | Number) // eg: 1: (2 + 1 +) 3   2: ((2 + 1 +) (5 + 6 -)) 3
 FunctionDeclaration ::= "func" Ignored Name Ignored "(" Variable ("," Variable)* ")" BlockStatement // eg: 1: func foo ($a) {}  2: func foo ($a[,$b][,$c]) {}   ("," Variable)*这部分是一个或多个
-BlockStatement  ::= "{" Ignored ReturnStatement Ignored "}"
-ReturnStatement ::= "return" BinaryExpression
+BlockStatement  ::= "{" Ignored (IfStatement | Print | Assignment | ReturnStatement ) Ignored "}"
+ReturnStatement ::= "return" (BinaryExpression | Variable)
 CallFunction    ::= Name "(" (Variable | Number) ("," (Variable | Number))* ")" Ignored
+IfStatement     ::= "if" Ignored "(" Variable Ignored Operator Ignored Variable ")" Ignored BlockStatement Ignored "else" Ignored BlockStatement Ignored
 
 ```
 

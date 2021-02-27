@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NewLexer = exports.Lexer = exports.tokenNameMap = exports.keywords = exports.TOKEN_FUNC_PARAMS_DIV = exports.TOKEN_RETURN = exports.BLOCK_END = exports.BLOCK_START = exports.TOKEN_FUNC = exports.Operator = exports.SourceCharacter = exports.COMMENT = exports.STRING = exports.NUMBER = exports.INTERGER = exports.TOKEN_IGNORED = exports.TOKEN_PRINT = exports.TOKEN_NAME = exports.TOKEN_DUOQUOTE = exports.TOKEN_QUOTE = exports.TOKEN_EQUAL = exports.TOKEN_RIGHT_PAREN = exports.TOKEN_LEFT_PAREN = exports.TOKEN_VAR_PREFIX = exports.TOKEN_EOF = exports.Tokens = void 0;
+exports.NewLexer = exports.Lexer = exports.tokenNameMap = exports.keywords = exports.TOKEN_IF = exports.TOKEN_FUNC_PARAMS_DIV = exports.TOKEN_RETURN = exports.BLOCK_END = exports.BLOCK_START = exports.TOKEN_FUNC = exports.Operator = exports.SourceCharacter = exports.COMMENT = exports.STRING = exports.NUMBER = exports.INTERGER = exports.TOKEN_IGNORED = exports.TOKEN_PRINT = exports.TOKEN_NAME = exports.TOKEN_DUOQUOTE = exports.TOKEN_QUOTE = exports.TOKEN_EQUAL = exports.TOKEN_RIGHT_PAREN = exports.TOKEN_LEFT_PAREN = exports.TOKEN_VAR_PREFIX = exports.TOKEN_EOF = exports.Tokens = void 0;
 // token const
 var Tokens;
 (function (Tokens) {
@@ -24,14 +24,16 @@ var Tokens;
     Tokens[Tokens["BLOCK_START"] = 17] = "BLOCK_START";
     Tokens[Tokens["BLOCK_END"] = 18] = "BLOCK_END";
     Tokens[Tokens["TOKEN_RETURN"] = 19] = "TOKEN_RETURN";
-    Tokens[Tokens["TOKEN_FUNC_PARAMS_DIV"] = 20] = "TOKEN_FUNC_PARAMS_DIV"; // ,
+    Tokens[Tokens["TOKEN_FUNC_PARAMS_DIV"] = 20] = "TOKEN_FUNC_PARAMS_DIV";
+    Tokens[Tokens["TOKEN_IF"] = 21] = "TOKEN_IF";
 })(Tokens = exports.Tokens || (exports.Tokens = {}));
-exports.TOKEN_EOF = Tokens.TOKEN_EOF, exports.TOKEN_VAR_PREFIX = Tokens.TOKEN_VAR_PREFIX, exports.TOKEN_LEFT_PAREN = Tokens.TOKEN_LEFT_PAREN, exports.TOKEN_RIGHT_PAREN = Tokens.TOKEN_RIGHT_PAREN, exports.TOKEN_EQUAL = Tokens.TOKEN_EQUAL, exports.TOKEN_QUOTE = Tokens.TOKEN_QUOTE, exports.TOKEN_DUOQUOTE = Tokens.TOKEN_DUOQUOTE, exports.TOKEN_NAME = Tokens.TOKEN_NAME, exports.TOKEN_PRINT = Tokens.TOKEN_PRINT, exports.TOKEN_IGNORED = Tokens.TOKEN_IGNORED, exports.INTERGER = Tokens.INTERGER, exports.NUMBER = Tokens.NUMBER, exports.STRING = Tokens.STRING, exports.COMMENT = Tokens.COMMENT, exports.SourceCharacter = Tokens.SourceCharacter, exports.Operator = Tokens.Operator, exports.TOKEN_FUNC = Tokens.TOKEN_FUNC, exports.BLOCK_START = Tokens.BLOCK_START, exports.BLOCK_END = Tokens.BLOCK_END, exports.TOKEN_RETURN = Tokens.TOKEN_RETURN, exports.TOKEN_FUNC_PARAMS_DIV = Tokens.TOKEN_FUNC_PARAMS_DIV;
+exports.TOKEN_EOF = Tokens.TOKEN_EOF, exports.TOKEN_VAR_PREFIX = Tokens.TOKEN_VAR_PREFIX, exports.TOKEN_LEFT_PAREN = Tokens.TOKEN_LEFT_PAREN, exports.TOKEN_RIGHT_PAREN = Tokens.TOKEN_RIGHT_PAREN, exports.TOKEN_EQUAL = Tokens.TOKEN_EQUAL, exports.TOKEN_QUOTE = Tokens.TOKEN_QUOTE, exports.TOKEN_DUOQUOTE = Tokens.TOKEN_DUOQUOTE, exports.TOKEN_NAME = Tokens.TOKEN_NAME, exports.TOKEN_PRINT = Tokens.TOKEN_PRINT, exports.TOKEN_IGNORED = Tokens.TOKEN_IGNORED, exports.INTERGER = Tokens.INTERGER, exports.NUMBER = Tokens.NUMBER, exports.STRING = Tokens.STRING, exports.COMMENT = Tokens.COMMENT, exports.SourceCharacter = Tokens.SourceCharacter, exports.Operator = Tokens.Operator, exports.TOKEN_FUNC = Tokens.TOKEN_FUNC, exports.BLOCK_START = Tokens.BLOCK_START, exports.BLOCK_END = Tokens.BLOCK_END, exports.TOKEN_RETURN = Tokens.TOKEN_RETURN, exports.TOKEN_FUNC_PARAMS_DIV = Tokens.TOKEN_FUNC_PARAMS_DIV, exports.TOKEN_IF = Tokens.TOKEN_IF;
 // regex match patterns
 const regexName = /^[_\d\w]+/;
 // 关键字
 exports.keywords = {
     "print": exports.TOKEN_PRINT,
+    "if": exports.TOKEN_IF,
 };
 exports.tokenNameMap = {
     [exports.TOKEN_EOF]: "EOF",
@@ -55,6 +57,7 @@ exports.tokenNameMap = {
     [exports.BLOCK_END]: "BLOCK_END",
     [exports.TOKEN_RETURN]: "TOKEN_RETURN",
     [exports.TOKEN_FUNC_PARAMS_DIV]: "TOKEN_FUNC_PARAMS_DIV",
+    [exports.TOKEN_IF]: "if",
 };
 class Lexer {
     constructor(sourceCode, lineNum, nextToken, nextTokenType, nextTokenLineNum) {
@@ -199,10 +202,24 @@ class Lexer {
             return { lineNum: this.lineNum, tokenType: exports.TOKEN_FUNC, token: "func" };
         }
         // Operator
-        if (/\+|\-|\*|\//.test(this.sourceCode[0])) {
-            const op = this.sourceCode[0];
+        const regexpResult = /\+|\-|\*|\//.exec(this.sourceCode[0]);
+        if (regexpResult) {
+            const op = regexpResult[0];
             this.skipSourceCode(1);
             return { lineNum: this.lineNum, tokenType: exports.Operator, token: op };
+        }
+        // Compare > < = >= <= ==
+        const Compare = /\>|\<|\=/.exec(this.sourceCode[0]);
+        if (Compare) {
+            const co = Compare[0];
+            this.skipSourceCode(1);
+            if (this.sourceCode[0] === "=") {
+                this.skipSourceCode(1);
+                return { lineNum: this.lineNum, tokenType: exports.Operator, token: `${co}=` };
+            }
+            else {
+                return { lineNum: this.lineNum, tokenType: exports.Operator, token: co };
+            }
         }
         // check multiple character token
         if (this.sourceCode[0] == '_' || this.isLetter(this.sourceCode[0])) {
