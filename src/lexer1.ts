@@ -16,6 +16,10 @@ Comment         ::= Ignored "#" SourceCharacter // 注释
 BinaryExpression::= (Variable | Number) Ignored Operator Ignored (Variable | Number)
 Operator        ::= "+" | "-" | "*" | "/"
 BinaryExpressions ::= (BinaryExpression Operator)+ Ignored (Variable | Number) // eg: 1: (2 + 1 +) 3   2: ((2 + 1 +) (5 + 6 -)) 3
+FunctionDeclaration ::= "func" Ignored Name Ignored "(" Variable ("," Variable)* ")" BlockStatement // eg: 1: func foo ($a) {}  2: func foo ($a[,$b][,$c]) {}   ("," Variable)*这部分是一个或多个
+BlockStatement  ::= "{" Ignored ReturnStatement Ignored "}"
+ReturnStatement ::= "return" BinaryExpression
+CallFunction    ::= Name "(" (Variable | Number) ("," (Variable | Number))* ")" Ignored
 
 */
 
@@ -47,6 +51,11 @@ export enum Tokens {
     COMMENT,                  // Ignored "#" SourceCharacter Ignored
     SourceCharacter,          // 所有代码字符串
     Operator,                 // +-*/ Operator
+    TOKEN_FUNC,        // func
+    BLOCK_START,              // {
+    BLOCK_END,                // }
+    TOKEN_RETURN,             // return
+    TOKEN_FUNC_PARAMS_DIV     // ,
 }
 
 export const { TOKEN_EOF,            // end-of-file
@@ -65,6 +74,11 @@ export const { TOKEN_EOF,            // end-of-file
     COMMENT,                  // Ignored "#" SourceCharacter Ignored
     SourceCharacter,          // 所有代码字符串
     Operator,                 // +-*/ Operator
+    TOKEN_FUNC,        // func
+    BLOCK_START,              // {
+    BLOCK_END,                // }
+    TOKEN_RETURN,             // return
+    TOKEN_FUNC_PARAMS_DIV,    // ,
 } = Tokens
 
 // regex match patterns
@@ -92,6 +106,11 @@ export const tokenNameMap: TokenNameMap = {
     [COMMENT]: "COMMENT",
     [SourceCharacter]: "SourceCharacter",
     [Operator]: "Operator",
+    [TOKEN_FUNC]: "TOKEN_FUNC",
+    [BLOCK_START]: "BLOCK_START",
+    [BLOCK_END]: "BLOCK_END",
+    [TOKEN_RETURN]: "TOKEN_RETURN",
+    [TOKEN_FUNC_PARAMS_DIV]: "TOKEN_FUNC_PARAMS_DIV",
 }
 
 export class Lexer {
@@ -220,6 +239,25 @@ export class Lexer {
             case '#':
                 this.skipSourceCode(1)
                 return { lineNum: this.lineNum, tokenType: COMMENT, token: "#" }
+            case ",":
+                this.skipSourceCode(1)
+                return { lineNum: this.lineNum, tokenType: TOKEN_FUNC_PARAMS_DIV, token: "," }
+            case "{":
+                this.skipSourceCode(1)
+                return { lineNum: this.lineNum, tokenType: BLOCK_START, token: "{" }
+            case "}":
+                this.skipSourceCode(1)
+                return { lineNum: this.lineNum, tokenType: BLOCK_END, token: "}" }
+        }
+        // return
+        if (this.sourceCode[0] === 'r' && this.sourceCode.slice(0, 6) === 'return') {
+            this.skipSourceCode(6)
+            return { lineNum: this.lineNum, tokenType: TOKEN_RETURN, token: "return" }
+        }
+        // func
+        if (this.sourceCode[0] === 'f' && this.sourceCode.slice(0, 4) === "func") {
+            this.skipSourceCode(4)
+            return { lineNum: this.lineNum, tokenType: TOKEN_FUNC, token: "func" }
         }
         // Operator
         if (/\+|\-|\*|\//.test(this.sourceCode[0])) {

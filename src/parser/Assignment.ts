@@ -1,6 +1,7 @@
 import { Variable } from "../definition";
-import { Lexer, NUMBER, Operator, tokenNameMap, Tokens, TOKEN_EQUAL, TOKEN_IGNORED, TOKEN_VAR_PREFIX } from "../lexer1";
+import { Lexer, NUMBER, Operator, tokenNameMap, Tokens, TOKEN_EQUAL, TOKEN_IGNORED, TOKEN_NAME, TOKEN_VAR_PREFIX } from "../lexer1";
 import { parseNumber, parseString, parseVariable } from "../parser";
+import { parseExpression } from "./Expression";
 
 export interface Assignment {
     LineNum?: number,
@@ -95,7 +96,12 @@ export function parseAssignment(lexer: Lexer) {
             return parseBinaryExpression(lexer, idAndinit, assignment, "Identifier")
         }
     } else {
-        if (tokenType === NUMBER) {
+        if (tokenType === TOKEN_NAME) { // 函数执行并赋值
+            const expression = parseExpression(lexer)
+            console.log(expression)
+            VariableDeclarator.init = expression.expression
+            assignment.type = "VariableDeclaration"
+        } else if (tokenType === NUMBER) {
             // console.log('parseNumber start')
             const literial = new Literal(parseNumber(lexer)) // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = literial
@@ -124,7 +130,7 @@ export function parseAssignment(lexer: Lexer) {
     }
 }
 
-function parseBinaryExpression(lexer: Lexer, idAndinit: { init: Literal | Identifier, id: Identifier }, assignment: Assignment, leftType: string) {
+export function parseBinaryExpression(lexer: Lexer, idAndinit: { init: Literal | Identifier, id: Identifier }, assignment: Assignment, leftType: string) {
     const BinaryExpression: {
         type: string,
         left: {

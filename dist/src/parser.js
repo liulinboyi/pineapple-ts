@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parse = exports.parseString = exports.parseNumber = exports.parseVariable = exports.Program = void 0;
+exports.parse = exports.parseString = exports.parseNumber = exports.parseName = exports.parseVariable = exports.Program = void 0;
 const lexer1_1 = require("./lexer1");
 const Comment_1 = require("./parser/Comment");
 const Print_1 = require("./parser/Print");
 const Assignment_1 = require("./parser/Assignment");
+const Function_1 = require("./parser/Function");
+const Expression_1 = require("./parser/Expression");
 class Program {
     constructor(type, body, LineNum) {
         this.type = 'Program';
@@ -46,6 +48,10 @@ function parseStatement(lexer) {
             return Assignment_1.parseAssignment(lexer);
         case lexer1_1.COMMENT:
             return Comment_1.paseComment(lexer);
+        case lexer1_1.TOKEN_FUNC:
+            return Function_1.parseFunction(lexer);
+        case lexer1_1.TOKEN_NAME:
+            return Expression_1.parseExpression(lexer);
         default:
             throw new Error("parseStatement(): unknown Statement.");
     }
@@ -68,6 +74,7 @@ function parseName(lexer) {
     let { nowLineNum: _, nowToken: name } = lexer.NextTokenIs(lexer1_1.TOKEN_NAME);
     return name;
 }
+exports.parseName = parseName;
 // Integer         ::= [0-9]+
 // Number          ::= Integer Ignored
 function parseNumber(lexer) {

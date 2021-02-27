@@ -1,8 +1,10 @@
-import { COMMENT, Lexer, NewLexer, NUMBER, tokenNameMap, TOKEN_DUOQUOTE, TOKEN_EOF, TOKEN_IGNORED, TOKEN_NAME, TOKEN_PRINT, TOKEN_QUOTE, TOKEN_VAR_PREFIX } from "./lexer1"
+import { COMMENT, Lexer, NewLexer, NUMBER, tokenNameMap, TOKEN_DUOQUOTE, TOKEN_EOF, TOKEN_FUNC, TOKEN_IGNORED, TOKEN_NAME, TOKEN_PRINT, TOKEN_QUOTE, TOKEN_VAR_PREFIX } from "./lexer1"
 import { Variable } from './definition'
 import { paseComment } from './parser/Comment'
 import { parsePrint, Print } from "./parser/Print"
 import { Assignment, parseAssignment } from "./parser/Assignment"
+import { parseFunction } from "./parser/Function"
+import { parseExpression } from "./parser/Expression"
 
 
 export class Program {
@@ -57,6 +59,10 @@ function parseStatement(lexer: Lexer) {
             return parseAssignment(lexer)
         case COMMENT:
             return paseComment(lexer)
+        case TOKEN_FUNC:
+            return parseFunction(lexer)
+        case TOKEN_NAME:
+            return parseExpression(lexer)
         default:
             throw new Error("parseStatement(): unknown Statement.")
     }
@@ -82,7 +88,7 @@ export function parseVariable(lexer: Lexer) {
 }
 
 // Name ::= [_A-Za-z][_0-9A-Za-z]*
-function parseName(lexer: Lexer) {
+export function parseName(lexer: Lexer) {
     let { nowLineNum: _, nowToken: name } = lexer.NextTokenIs(TOKEN_NAME)
     return name
 }

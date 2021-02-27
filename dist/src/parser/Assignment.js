@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseAssignment = exports.Assignment = exports.Identifier = exports.Literal = void 0;
+exports.parseBinaryExpression = exports.parseAssignment = exports.Assignment = exports.Identifier = exports.Literal = void 0;
 const lexer1_1 = require("../lexer1");
 const parser_1 = require("../parser");
+const Expression_1 = require("./Expression");
 class Literal {
     constructor(value, type = 'Literal') {
         this.type = type;
@@ -71,7 +72,13 @@ function parseAssignment(lexer) {
         }
     }
     else {
-        if (tokenType === lexer1_1.NUMBER) {
+        if (tokenType === lexer1_1.TOKEN_NAME) { // 函数执行并赋值
+            const expression = Expression_1.parseExpression(lexer);
+            console.log(expression);
+            VariableDeclarator.init = expression.expression;
+            assignment.type = "VariableDeclaration";
+        }
+        else if (tokenType === lexer1_1.NUMBER) {
             // console.log('parseNumber start')
             const literial = new Literal(parser_1.parseNumber(lexer)); // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = literial;
@@ -138,3 +145,4 @@ function parseBinaryExpression(lexer, idAndinit, assignment, leftType) {
     assignment.declarations.push(VariableDeclarator);
     return assignment;
 }
+exports.parseBinaryExpression = parseBinaryExpression;
