@@ -23,15 +23,13 @@ function Execute(code) {
     // parse
     ast = parser_1.parse(code);
     for (let i = 0; i < ast.body.length; i++) {
-        console.log(ast.body[i].type, 'type');
         if (ast.body[i].type === "COMMENT") { // 如果是注释，删除
-            console.log(i);
             ast.body.splice(i, 1);
             i--;
         }
     }
-    console.log(JSON.stringify(ast, null, 4), '\r\rAST');
-    console.log("--------------------------------------------");
+    // console.log(JSON.stringify(ast, null, 4), '\r\rAST')
+    // console.log("--------------------------------------------")
     // resolve
     const vm = new index_js_1.default(ast);
     vm.run();
@@ -87,19 +85,15 @@ function resolveAssignment(g, assignment) {
 function resolvePrint(g, print) {
     let varName = "";
     varName = print.Variable.Name;
-    // console.log(varName, 'varName')
-    // console.log(g, 'g')
     if (varName == "") {
         throw new Error("resolvePrint(): variable name can NOT be empty.");
     }
     let str = "";
     let ok = false;
     str = g.Variables[varName];
-    // console.log(str, 'str')
     ok = str !== null && str !== undefined ? true : false;
     if (!ok) {
         throw new Error(`resolvePrint(): variable '$${varName}'not found.`);
     }
-    console.log(str);
     return null;
 }

@@ -19,7 +19,7 @@ BinaryExpression::= (Variable | Number) Ignored Operator Ignored (Variable | Num
 Operator        ::= "+" | "-" | "*" | "/" | ">" | "<" | "==" | ">=" | "<="
 BinaryExpressions ::= (BinaryExpression Operator)+ Ignored (Variable | Number) // eg: 1: (2 + 1 +) 3   2: ((2 + 1 +) (5 + 6 -)) 3
 FunctionDeclaration ::= "func" Ignored Name Ignored "(" Variable ("," Variable)* ")" BlockStatement // eg: 1: func foo ($a) {}  2: func foo ($a[,$b][,$c]) {}   ("," Variable)*这部分是一个或多个
-BlockStatement  ::= "{" Ignored (IfStatement | Print | Assignment | ReturnStatement ) Ignored "}"
+BlockStatement  ::= "{" Ignored (IfStatement | CallFunction | Print | Assignment | ReturnStatement ) Ignored "}"
 ReturnStatement ::= "return" (BinaryExpression | Variable)
 CallFunction    ::= Name "(" (Variable | Number) ("," (Variable | Number))* ")" Ignored
 IfStatement     ::= "if" Ignored "(" Variable Ignored Operator Ignored Variable ")" Ignored BlockStatement Ignored "else" Ignored BlockStatement Ignored
@@ -31,7 +31,11 @@ TypeScript implementation of pineapple language (https://github.com/karminski/pi
 [karminski/pineapple](https://github.com/karminski/pineapple)
 
 ## 说明
-pineapple lang 是一个简单的编程语言 demo. 它包含了个手写的递归下降解析器和一个简单的解释器. 虽然该语言甚至不是图灵完备的. 但 pineapple 的主要目的是让编译原理初学者有一个预热, 简单了解一个编程语言是怎么构建的.
+pineapple lang 是一个简单的编程语言 demo. 它包含了个手写的递归下降解析器和一个简单的解释器. 
+
+该语言现在应该是图灵完备的. 
+
+pineapple 的主要目的是让编译原理初学者有一个预热, 简单了解一个编程语言是怎么构建的.
 
 ## 运行
 ```
@@ -44,4 +48,30 @@ npm run test
 - [liulinboyi](https://github.com/liulinboyi)
 
 
-# 最后把代码转成JavaScript的AST然后使用[javascript的解释器canjs](https://github.com/jrainlau/canjs)执行代码.
+# 最后把代码转成[JavaScript的AST](https://astexplorer.net/)然后使用[javascript的解释器canjs](https://github.com/jrainlau/canjs)执行代码.
+
+# 最后算是完成大部分了，实现了递归调用，解决了求斐波那契数问题。
+
+```
+# 求斐波那契数
+func Fibonacci($a) {
+	
+	if ($a <= 2) {
+		return 1
+	}
+
+	$_a = $a - 1
+
+	$_b = $a - 2
+
+	$aa = Fibonacci($_a)
+
+	$bb = Fibonacci($_b)
+
+	return $aa + $bb
+}
+
+$res = Fibonacci(7)
+
+print($res)
+```

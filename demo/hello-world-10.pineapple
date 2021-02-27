@@ -1,0 +1,21 @@
+# 求斐波那契数
+func Fibonacci($a) {
+	
+	if ($a <= 2) {
+		return 1
+	}
+
+	$_a = $a - 1
+
+	$_b = $a - 2
+
+	$aa = Fibonacci($_a)
+
+	$bb = Fibonacci($_b)
+
+	return $aa + $bb
+}
+
+$res = Fibonacci(7)
+
+print($res)

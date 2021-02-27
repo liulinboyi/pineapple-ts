@@ -20,7 +20,6 @@ function parseIfStatement(lexer) {
         body: []
     };
     consequent.body = Function_1.paseBlock(lexer, BlockStatementBody);
-    console.log(consequent);
     lexer.NextTokenIs(lexer1_1.BLOCK_END);
     lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 去除空格回车等
     return {
@@ -44,14 +43,11 @@ function parseBinaryExpression(lexer) {
         }
     };
     const Variable = parser_1.parseVariable(lexer); // 标识符,这里面会把邻近的空格回车删掉
-    console.log(Variable, 'Variable');
     const identifier = new Assignment_1.Identifier(Variable.Name);
-    console.log(identifier);
     let leftType = identifier.type;
     BinaryExpression.operator = (lexer.NextTokenIs(lexer1_1.Operator)).nowToken; // +-*/
     lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 空格
     let ahead = lexer.LookAhead();
-    console.log(ahead, 'parseBinaryExpression ahead');
     if (leftType === 'Identifier') {
         BinaryExpression.left = new Assignment_1.Identifier(identifier.name);
     }
@@ -59,17 +55,14 @@ function parseBinaryExpression(lexer) {
         // BinaryExpression.left = new Literal((idAndinit.init as Literal).value)
     }
     if (ahead.tokenType === lexer1_1.NUMBER) {
-        console.log('NUMBER');
         const literial = new Assignment_1.Literal(parser_1.parseNumber(lexer));
         BinaryExpression.right = literial;
     }
     else if (ahead.tokenType === lexer1_1.TOKEN_VAR_PREFIX) {
         const Variable = parser_1.parseVariable(lexer); // 标识符
-        console.log(Variable, 'Variable');
         const identifier = new Assignment_1.Identifier(Variable.Name);
         BinaryExpression.right = identifier;
     }
-    console.log(BinaryExpression);
     return BinaryExpression;
 }
 exports.parseBinaryExpression = parseBinaryExpression;

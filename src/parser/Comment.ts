@@ -16,12 +16,10 @@ export class Comment {
 
 export function paseComment(lexer: Lexer) {
     let comment = new Comment()
-    console.log("paseComment start")
 
     comment.LineNum = lexer.GetLineNum()
     lexer.NextTokenIs(COMMENT)
 
-    console.log(lexer.isNewLine(lexer.sourceCode[0]), 'isNewLine')
     let content = ""
     // 如果换行或者源码为空则停止解析注释
     while (!lexer.isNewLine(lexer.sourceCode[0]) && !lexer.isEmpty()) {

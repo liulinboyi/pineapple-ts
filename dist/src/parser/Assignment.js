@@ -49,17 +49,14 @@ function parseAssignment(lexer) {
     lexer.NextTokenIs(lexer1_1.TOKEN_EQUAL); // =
     lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 空格
     const tokenType = lexer.LookAhead().tokenType;
-    console.log(tokenType, 'lexer.LookAhead().tokenType');
     // 如果后面仍是$
     if (tokenType === lexer1_1.TOKEN_VAR_PREFIX) {
         const Variable = parser_1.parseVariable(lexer); // 标识符,这里面会把邻近的空格回车删掉
-        console.log(Variable, 'Variable');
         const identifier = new Identifier(Variable.Name);
         VariableDeclarator.init = identifier;
         assignment.type = "VariableDeclaration";
         assignment.declarations.push(VariableDeclarator); // 一行只允许声明和初始化一个变量
         let ahead = lexer.LookAhead();
-        console.log(ahead, 'parseAssignment Variable ahead');
         if (ahead.tokenType !== lexer1_1.Operator) {
             return assignment;
         }
@@ -74,16 +71,13 @@ function parseAssignment(lexer) {
     else {
         if (tokenType === lexer1_1.TOKEN_NAME) { // 函数执行并赋值
             const expression = Expression_1.parseExpression(lexer);
-            console.log(expression);
             VariableDeclarator.init = expression.expression;
             assignment.type = "VariableDeclaration";
         }
         else if (tokenType === lexer1_1.NUMBER) {
-            // console.log('parseNumber start')
             const literial = new Literal(parser_1.parseNumber(lexer)); // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = literial;
             assignment.type = "VariableDeclaration";
-            // console.log('parseNumber end')
         }
         else {
             const literial = new Literal(parser_1.parseString(lexer)); // 这里面会把邻近的空格回车删掉
@@ -92,7 +86,6 @@ function parseAssignment(lexer) {
         }
         assignment.declarations.push(VariableDeclarator); // 一行只允许声明和初始化一个变量
         let ahead = lexer.LookAhead();
-        console.log(ahead, 'parseAssignment not Variable ahead');
         if (ahead.tokenType !== lexer1_1.Operator) {
             return assignment;
         }
@@ -120,7 +113,6 @@ function parseBinaryExpression(lexer, idAndinit, assignment, leftType) {
         }
     };
     let ahead = lexer.LookAhead();
-    console.log(ahead, 'parseBinaryExpression ahead');
     if (leftType === 'Identifier') {
         BinaryExpression.left = new Identifier(idAndinit.init.name);
     }
@@ -128,13 +120,11 @@ function parseBinaryExpression(lexer, idAndinit, assignment, leftType) {
         BinaryExpression.left = new Literal(idAndinit.init.value);
     }
     if (ahead.tokenType === lexer1_1.NUMBER) {
-        console.log('NUMBER');
         const literial = new Literal(parser_1.parseNumber(lexer));
         BinaryExpression.right = literial;
     }
     else if (ahead.tokenType === lexer1_1.TOKEN_VAR_PREFIX) {
         const Variable = parser_1.parseVariable(lexer); // 标识符
-        console.log(Variable, 'Variable');
         const identifier = new Identifier(Variable.Name);
         BinaryExpression.right = identifier;
     }

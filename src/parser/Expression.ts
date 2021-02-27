@@ -25,7 +25,7 @@ export function parseExpression(lexer: Lexer) {
         let p: any
         // $
         if (tokenType === TOKEN_VAR_PREFIX) {
-            p = parseVariable(lexer)
+            p = parseVariable(lexer).Name
             params.push(new Identifier(p))
         } else if (tokenType === NUMBER) {
             p = parseNumber(lexer)

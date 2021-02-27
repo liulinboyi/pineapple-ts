@@ -144,7 +144,6 @@ class Lexer {
     // 匹配Token并跳过匹配的Token
     MatchToken() {
         this.checkCode(this.sourceCode[0]); // 只做检查，不吃字符
-        // console.log(this.sourceCode[0], '当前Token')
         // check ignored
         if (this.isIgnored()) {
             return { lineNum: this.lineNum, tokenType: exports.TOKEN_IGNORED, token: "Ignored" };
@@ -168,7 +167,11 @@ class Lexer {
             case ')':
                 this.skipSourceCode(1);
                 return { lineNum: this.lineNum, tokenType: exports.TOKEN_RIGHT_PAREN, token: ")" };
-            case '=':
+            case '=': // =
+                if (this.sourceCode[1] === "=") { // ==
+                    this.skipSourceCode(2);
+                    return { lineNum: this.lineNum, tokenType: exports.Operator, token: "==" };
+                }
                 this.skipSourceCode(1);
                 return { lineNum: this.lineNum, tokenType: exports.TOKEN_EQUAL, token: "=" };
             case '"':

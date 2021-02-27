@@ -1,6 +1,7 @@
-import { TOKEN_IGNORED, TOKEN_LEFT_PAREN, Lexer, TOKEN_RIGHT_PAREN, TOKEN_FUNC_PARAMS_DIV, TOKEN_FUNC, BLOCK_START, TOKEN_RETURN, NUMBER, TOKEN_VAR_PREFIX, Operator, BLOCK_END, TOKEN_PRINT, TOKEN_IF } from "../lexer1";
+import { TOKEN_IGNORED, TOKEN_LEFT_PAREN, Lexer, TOKEN_RIGHT_PAREN, TOKEN_FUNC_PARAMS_DIV, TOKEN_FUNC, BLOCK_START, TOKEN_RETURN, NUMBER, TOKEN_VAR_PREFIX, Operator, BLOCK_END, TOKEN_PRINT, TOKEN_IF, TOKEN_NAME } from "../lexer1";
 import { parseName, parseNumber, parseString, parseVariable } from "../parser";
 import { Assignment, Identifier, Literal, parseAssignment, parseBinaryExpression } from "./Assignment";
+import { parseExpression } from "./Expression";
 import { parseIfStatement } from "./IfStatement";
 import { parsePrint } from "./Print";
 
@@ -83,7 +84,6 @@ export function paseBlock(lexer: Lexer, BlockStatementBody: any) {
         })
     } else if (ahead.tokenType === TOKEN_VAR_PREFIX) { // $
         const VariableDeclaration = parseAssignment(lexer)
-        console.log(VariableDeclaration)
         BlockStatementBody.push({
             type: VariableDeclaration.type,
             declarations: VariableDeclaration.declarations,
@@ -92,15 +92,16 @@ export function paseBlock(lexer: Lexer, BlockStatementBody: any) {
         paseBlock(lexer, BlockStatementBody)
     } else if (ahead.tokenType === TOKEN_PRINT) {
         const print = parsePrint(lexer)
-        console.log(print)
         BlockStatementBody.push(print)
         paseBlock(lexer, BlockStatementBody)
     } else if (ahead.tokenType === TOKEN_IF) {
         const IfStatement = parseIfStatement(lexer)
-        console.log(IfStatement)
         BlockStatementBody.push(IfStatement)
         paseBlock(lexer, BlockStatementBody)
     }
+    // else if (ahead.tokenType === TOKEN_NAME) {
+    //     const ExpressionStatement = parseExpression(lexer)
+    // }
     return BlockStatementBody
 }
 
@@ -115,18 +116,15 @@ export function paseReturnStatement(lexer: Lexer) {
 
     const tokenType = lexer.LookAhead().tokenType
 
-    console.log(tokenType, 'lexer.LookAhead().tokenType')
     // 如果后面仍是$
     if (tokenType === TOKEN_VAR_PREFIX) {
         const Variable = parseVariable(lexer) // 标识符,这里面会把邻近的空格回车删掉
-        console.log(Variable, 'Variable')
         const identifier = new Identifier(Variable.Name);
         VariableDeclarator.init = identifier
         assignment.type = "ReturnStatement"
         assignment.declarations.push(VariableDeclarator) // 一行只允许声明和初始化一个变量
 
         let ahead = lexer.LookAhead()
-        console.log(ahead, 'parseAssignment Variable ahead')
 
         if (ahead.tokenType !== Operator) {
             return assignment
@@ -139,11 +137,9 @@ export function paseReturnStatement(lexer: Lexer) {
         }
     } else {
         if (tokenType === NUMBER) {
-            // console.log('parseNumber start')
             const literial = new Literal(parseNumber(lexer)) // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = literial
             assignment.type = "ReturnStatement"
-            // console.log('parseNumber end')
         } else {
             const literial = new Literal(parseString(lexer)) // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = literial
@@ -153,7 +149,6 @@ export function paseReturnStatement(lexer: Lexer) {
         assignment.declarations.push(VariableDeclarator) // 一行只允许声明和初始化一个变量
 
         let ahead = lexer.LookAhead()
-        console.log(ahead, 'parseAssignment not Variable ahead')
 
         if (ahead.tokenType !== Operator) {
             return assignment

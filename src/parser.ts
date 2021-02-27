@@ -51,7 +51,6 @@ function parseStatement(lexer: Lexer) {
     // 向前看一个token并跳过
     lexer.LookAheadAndSkip(TOKEN_IGNORED) // skip if source code start with ignored token
     let look = lexer.LookAhead().tokenType
-    console.log(look, 'look')
     switch (look) {
         case TOKEN_PRINT:
             return parsePrint(lexer)
@@ -99,16 +98,11 @@ export function parseNumber(lexer: Lexer) {
     let str = ""
     let { tokenType, token } = lexer.LookAhead()
     str += token
-    // console.log(tokenType, 'parseNumber', str, 'str')
     if (tokenType === NUMBER) {
 
         while (lexer.isNumber(lexer.sourceCode[0])) {
-            // console.log(lexer.sourceCode[0])
             str += lexer.next(1)
         }
-        // if (!lexer.isIgnored()) {
-        //     throw new Error('Uncaught SyntaxError: Invalid or unexpected token')
-        // }
         lexer.NextTokenIs(NUMBER)
 
         lexer.LookAheadAndSkip(TOKEN_IGNORED)
@@ -142,6 +136,5 @@ export function parse(code: string) {
     let sourceCode = parseSourceCode(lexer);
 
     lexer.NextTokenIs(TOKEN_EOF)
-    // console.log(JSON.stringify(sourceCode), 'sourceCode')
     return sourceCode
 }

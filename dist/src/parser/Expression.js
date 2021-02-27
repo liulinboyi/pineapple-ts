@@ -24,7 +24,7 @@ function parseExpression(lexer) {
         let p;
         // $
         if (tokenType === lexer1_1.TOKEN_VAR_PREFIX) {
-            p = parser_1.parseVariable(lexer);
+            p = parser_1.parseVariable(lexer).Name;
             params.push(new Assignment_1.Identifier(p));
         }
         else if (tokenType === lexer1_1.NUMBER) {

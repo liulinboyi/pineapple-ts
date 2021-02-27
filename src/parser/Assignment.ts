@@ -73,18 +73,15 @@ export function parseAssignment(lexer: Lexer) {
 
     const tokenType = lexer.LookAhead().tokenType
 
-    console.log(tokenType, 'lexer.LookAhead().tokenType')
     // 如果后面仍是$
     if (tokenType === TOKEN_VAR_PREFIX) {
         const Variable = parseVariable(lexer) // 标识符,这里面会把邻近的空格回车删掉
-        console.log(Variable, 'Variable')
         const identifier = new Identifier(Variable.Name);
         VariableDeclarator.init = identifier
         assignment.type = "VariableDeclaration"
         assignment.declarations.push(VariableDeclarator) // 一行只允许声明和初始化一个变量
 
         let ahead = lexer.LookAhead()
-        console.log(ahead, 'parseAssignment Variable ahead')
 
         if (ahead.tokenType !== Operator) {
             return assignment
@@ -98,15 +95,12 @@ export function parseAssignment(lexer: Lexer) {
     } else {
         if (tokenType === TOKEN_NAME) { // 函数执行并赋值
             const expression = parseExpression(lexer)
-            console.log(expression)
             VariableDeclarator.init = expression.expression
             assignment.type = "VariableDeclaration"
         } else if (tokenType === NUMBER) {
-            // console.log('parseNumber start')
             const literial = new Literal(parseNumber(lexer)) // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = literial
             assignment.type = "VariableDeclaration"
-            // console.log('parseNumber end')
         } else {
             const literial = new Literal(parseString(lexer)) // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = literial
@@ -116,7 +110,6 @@ export function parseAssignment(lexer: Lexer) {
         assignment.declarations.push(VariableDeclarator) // 一行只允许声明和初始化一个变量
 
         let ahead = lexer.LookAhead()
-        console.log(ahead, 'parseAssignment not Variable ahead')
 
         if (ahead.tokenType !== Operator) {
             return assignment
@@ -157,19 +150,16 @@ export function parseBinaryExpression(lexer: Lexer, idAndinit: { init: Literal |
     }
 
     let ahead = lexer.LookAhead()
-    console.log(ahead, 'parseBinaryExpression ahead')
     if (leftType === 'Identifier') {
         BinaryExpression.left = new Identifier((idAndinit.init as Identifier).name)
     } else if (leftType === 'Literal') {
         BinaryExpression.left = new Literal((idAndinit.init as Literal).value)
     }
     if (ahead.tokenType === NUMBER) {
-        console.log('NUMBER')
         const literial = new Literal(parseNumber(lexer))
         BinaryExpression.right = literial
     } else if (ahead.tokenType === TOKEN_VAR_PREFIX) {
         const Variable = parseVariable(lexer) // 标识符
-        console.log(Variable, 'Variable')
         const identifier = new Identifier(Variable.Name);
         BinaryExpression.right = identifier
     }

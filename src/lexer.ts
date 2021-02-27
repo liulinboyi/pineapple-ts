@@ -100,7 +100,6 @@ export class Lexer {
     }
     // 匹配Token并跳过匹配的Token
     MatchToken(): { lineNum: number, tokenType: number, token: string } {
-        // console.log(this.sourceCode[0], '当前Token')
         // check ignored
         if (this.isIgnored()) {
             return { lineNum: this.lineNum, tokenType: TOKEN_IGNORED, token: "Ignored" }

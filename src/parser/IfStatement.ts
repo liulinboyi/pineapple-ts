@@ -18,7 +18,6 @@ export function parseIfStatement(lexer: Lexer) {
         body: []
     }
     consequent.body = paseBlock(lexer, BlockStatementBody)
-    console.log(consequent)
     lexer.NextTokenIs(BLOCK_END)
     lexer.LookAheadAndSkip(TOKEN_IGNORED) // 去除空格回车等
     return {
@@ -55,30 +54,24 @@ export function parseBinaryExpression(lexer: Lexer) {
     }
 
     const Variable = parseVariable(lexer) // 标识符,这里面会把邻近的空格回车删掉
-    console.log(Variable, 'Variable')
     const identifier = new Identifier(Variable.Name);
-    console.log(identifier)
     let leftType = identifier.type
     BinaryExpression.operator = (lexer.NextTokenIs(Operator)).nowToken; // +-*/
     lexer.LookAheadAndSkip(TOKEN_IGNORED); // 空格
 
     let ahead = lexer.LookAhead()
-    console.log(ahead, 'parseBinaryExpression ahead')
     if (leftType === 'Identifier') {
         BinaryExpression.left = new Identifier(identifier.name)
     } else if (leftType === 'Literal') {
         // BinaryExpression.left = new Literal((idAndinit.init as Literal).value)
     }
     if (ahead.tokenType === NUMBER) {
-        console.log('NUMBER')
         const literial = new Literal(parseNumber(lexer))
         BinaryExpression.right = literial
     } else if (ahead.tokenType === TOKEN_VAR_PREFIX) {
         const Variable = parseVariable(lexer) // 标识符
-        console.log(Variable, 'Variable')
         const identifier = new Identifier(Variable.Name);
         BinaryExpression.right = identifier
     }
-    console.log(BinaryExpression)
     return BinaryExpression
 }

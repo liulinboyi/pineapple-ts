@@ -17,7 +17,7 @@ BinaryExpression::= (Variable | Number) Ignored Operator Ignored (Variable | Num
 Operator        ::= "+" | "-" | "*" | "/" | ">" | "<" | "==" | ">=" | "<="
 BinaryExpressions ::= (BinaryExpression Operator)+ Ignored (Variable | Number) // eg: 1: (2 + 1 +) 3   2: ((2 + 1 +) (5 + 6 -)) 3
 FunctionDeclaration ::= "func" Ignored Name Ignored "(" Variable ("," Variable)* ")" BlockStatement // eg: 1: func foo ($a) {}  2: func foo ($a[,$b][,$c]) {}   ("," Variable)*这部分是一个或多个
-BlockStatement  ::= "{" Ignored (IfStatement | Print | Assignment | ReturnStatement ) Ignored "}"
+BlockStatement  ::= "{" Ignored (IfStatement | CallFunction | Print | Assignment | ReturnStatement ) Ignored "}"
 ReturnStatement ::= "return" (BinaryExpression | Variable)
 CallFunction    ::= Name "(" (Variable | Number) ("," (Variable | Number))* ")" Ignored
 IfStatement     ::= "if" Ignored "(" Variable Ignored Operator Ignored Variable ")" Ignored BlockStatement Ignored "else" Ignored BlockStatement Ignored
@@ -208,7 +208,6 @@ export class Lexer {
     // 匹配Token并跳过匹配的Token
     MatchToken(): { lineNum: number, tokenType: number, token: string } {
         this.checkCode(this.sourceCode[0]) // 只做检查，不吃字符
-        // console.log(this.sourceCode[0], '当前Token')
         // check ignored
         if (this.isIgnored()) {
             return { lineNum: this.lineNum, tokenType: TOKEN_IGNORED, token: "Ignored" }
@@ -232,7 +231,11 @@ export class Lexer {
             case ')':
                 this.skipSourceCode(1)
                 return { lineNum: this.lineNum, tokenType: TOKEN_RIGHT_PAREN, token: ")" }
-            case '=':
+            case '=': // =
+                if (this.sourceCode[1] === "=") { // ==
+                    this.skipSourceCode(2)
+                    return { lineNum: this.lineNum, tokenType: Operator, token: "==" }
+                }
                 this.skipSourceCode(1)
                 return { lineNum: this.lineNum, tokenType: TOKEN_EQUAL, token: "=" }
             case '"':

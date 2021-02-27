@@ -1,0 +1,17 @@
+# 累加
+func add($a) {
+	
+	if ($a == 1) {
+		return 1
+	}
+
+	$_a = $a - 1
+
+	$aa = add($_a)
+
+	return $a + $aa
+}
+
+$res = add(3)
+
+print($res)
