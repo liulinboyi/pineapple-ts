@@ -4,6 +4,7 @@ exports.paseReturnStatement = exports.paseBlock = exports.parseFunction = void 0
 const lexer1_1 = require("../lexer1");
 const parser_1 = require("../parser");
 const Assignment_1 = require("./Assignment");
+const Print_1 = require("./Print");
 function parseFunction(lexer) {
     const FunctionDeclaration = {
         type: "FunctionDeclaration",
@@ -86,6 +87,12 @@ function paseBlock(lexer) {
             declarations: VariableDeclaration.declarations,
             kind: VariableDeclaration.kind
         });
+        paseBlock(lexer);
+    }
+    else if (ahead.tokenType === lexer1_1.TOKEN_PRINT) {
+        const print = Print_1.parsePrint(lexer);
+        console.log(print);
+        BlockStatementBody.push(print);
         paseBlock(lexer);
     }
     return BlockStatementBody;

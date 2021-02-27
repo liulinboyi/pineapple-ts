@@ -1,6 +1,7 @@
-import { TOKEN_IGNORED, TOKEN_LEFT_PAREN, Lexer, TOKEN_RIGHT_PAREN, TOKEN_FUNC_PARAMS_DIV, TOKEN_FUNC, BLOCK_START, TOKEN_RETURN, NUMBER, TOKEN_VAR_PREFIX, Operator, BLOCK_END } from "../lexer1";
+import { TOKEN_IGNORED, TOKEN_LEFT_PAREN, Lexer, TOKEN_RIGHT_PAREN, TOKEN_FUNC_PARAMS_DIV, TOKEN_FUNC, BLOCK_START, TOKEN_RETURN, NUMBER, TOKEN_VAR_PREFIX, Operator, BLOCK_END, TOKEN_PRINT } from "../lexer1";
 import { parseName, parseNumber, parseString, parseVariable } from "../parser";
 import { Assignment, Identifier, Literal, parseAssignment, parseBinaryExpression } from "./Assignment";
+import { parsePrint } from "./Print";
 
 export function parseFunction(lexer: Lexer) {
     const FunctionDeclaration: any = {
@@ -86,6 +87,11 @@ export function paseBlock(lexer: Lexer) {
             declarations: VariableDeclaration.declarations,
             kind: VariableDeclaration.kind
         })
+        paseBlock(lexer)
+    } else if (ahead.tokenType === TOKEN_PRINT) {
+        const print = parsePrint(lexer)
+        console.log(print)
+        BlockStatementBody.push(print)
         paseBlock(lexer)
     }
     return BlockStatementBody
