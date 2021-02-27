@@ -31,11 +31,18 @@ TypeScript implementation of pineapple language (https://github.com/karminski/pi
 [karminski/pineapple](https://github.com/karminski/pineapple)
 
 ## 说明
-pineapple lang 是一个简单的编程语言 demo. 它包含了个手写的递归下降解析器和一个简单的解释器. 
+pineapple lang 是一个简单的编程语言 demo. 它包含了个手写的递归下降解析器. 
 
 该语言现在应该是图灵完备的. 
 
 pineapple 的主要目的是让编译原理初学者有一个预热, 简单了解一个编程语言是怎么构建的.
+
+
+Pineapple lang is a simple programming language demo. It contains a handwritten recursive descending parser.
+
+The language should now be Turing complete.
+
+The main purpose of pineapple is to give beginners of compilation principles a warm-up and a simple understanding of how a programming language is built.
 
 ## 运行
 ```
