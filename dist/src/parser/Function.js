@@ -58,22 +58,37 @@ function parseFunction(lexer) {
     lexer.NextTokenIs(lexer1_1.BLOCK_START);
     lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 去除空格回车等
     const block = paseBlock(lexer);
-    FunctionDeclaration.body.body.push({
-        type: "ReturnStatement",
-        argument: block.declarations[0].init
-    });
+    FunctionDeclaration.body.body = block;
     lexer.NextTokenIs(lexer1_1.BLOCK_END);
     lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
     return FunctionDeclaration;
 }
 exports.parseFunction = parseFunction;
+const BlockStatementBody = [];
 function paseBlock(lexer) {
     const ahead = lexer.LookAhead();
-    if (ahead.tokenType === lexer1_1.TOKEN_RETURN) {
+    if (ahead.tokenType === lexer1_1.TOKEN_RETURN) { // return
         lexer.NextTokenIs(lexer1_1.TOKEN_RETURN);
         lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
-        return paseReturnStatement(lexer);
+        const returnStatement = paseReturnStatement(lexer);
+        // returnStatement.argument = returnStatement.declarations[0].init
+        // delete returnStatement.declarations
+        BlockStatementBody.push({
+            type: "ReturnStatement",
+            argument: returnStatement.declarations[0].init
+        });
     }
+    else if (ahead.tokenType === lexer1_1.TOKEN_VAR_PREFIX) { // $
+        const VariableDeclaration = Assignment_1.parseAssignment(lexer);
+        console.log(VariableDeclaration);
+        BlockStatementBody.push({
+            type: VariableDeclaration.type,
+            declarations: VariableDeclaration.declarations,
+            kind: VariableDeclaration.kind
+        });
+        paseBlock(lexer);
+    }
+    return BlockStatementBody;
 }
 exports.paseBlock = paseBlock;
 function paseReturnStatement(lexer) {
@@ -90,7 +105,7 @@ function paseReturnStatement(lexer) {
         console.log(Variable, 'Variable');
         const identifier = new Assignment_1.Identifier(Variable.Name);
         VariableDeclarator.init = identifier;
-        assignment.type = "VariableDeclaration";
+        assignment.type = "ReturnStatement";
         assignment.declarations.push(VariableDeclarator); // 一行只允许声明和初始化一个变量
         let ahead = lexer.LookAhead();
         console.log(ahead, 'parseAssignment Variable ahead');
@@ -110,13 +125,13 @@ function paseReturnStatement(lexer) {
             // console.log('parseNumber start')
             const literial = new Assignment_1.Literal(parser_1.parseNumber(lexer)); // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = literial;
-            assignment.type = "VariableDeclaration";
+            assignment.type = "ReturnStatement";
             // console.log('parseNumber end')
         }
         else {
             const literial = new Assignment_1.Literal(parser_1.parseString(lexer)); // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = literial;
-            assignment.type = "VariableDeclaration";
+            assignment.type = "ReturnStatement";
         }
         assignment.declarations.push(VariableDeclarator); // 一行只允许声明和初始化一个变量
         let ahead = lexer.LookAhead();

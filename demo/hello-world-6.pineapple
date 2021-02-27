@@ -1,0 +1,9 @@
+
+func add($a,$b) {
+	$_a = $a + $b
+	return $_a + 1
+}
+
+$res = add(1,2)
+
+print($res)
