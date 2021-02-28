@@ -82,3 +82,27 @@ $res = Fibonacci(7)
 
 print($res)
 ```
+# 对应JavaScript中的代码如下
+```javascript
+// 求斐波那契数
+function Fibonacci($a) {
+	
+	if ($a <= 2) {
+		return 1
+	}
+
+	let $_a = $a - 1
+
+	let $_b = $a - 2
+
+	let $aa = Fibonacci($_a)
+
+	let $bb = Fibonacci($_b)
+
+	return $aa + $bb
+}
+
+let $res = Fibonacci(7)
+
+console.log($res)
+```
