@@ -1,5 +1,7 @@
 # pineapple-ts
 
+## 敏捷开发，主要是思路，细节不是很完美
+
 ## 可以用[在线解析EBNF](https://bottlecaps.de/rr/ui)
 ## EBNF：
 ```
