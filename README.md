@@ -12,17 +12,23 @@ Integer         ::= [0-9]+
 Number          ::= Integer Ignored
 String          ::= '"' '"' Ignored | '"' StringCharacter '"' Ignored
 Variable        ::= "$" Name Ignored // 变量 
-Assignment      ::= Variable Ignored '=' Ignored ( String | Number |  Variable | BinaryExpression) Ignored
+Assignment      ::= Variable Ignored '=' Ignored ( String | Number |  Variable | Expressions) Ignored
 Print           ::= "print" "(" Ignored Variable Ignored ")" Ignored
 Statement       ::= Print | Assignment
 SourceCode      ::= Statement+ 
 Comment         ::= Ignored "#" SourceCharacter // 注释 
-BinaryExpression::= (Variable | Number) Ignored Operator Ignored (Variable | Number)
-Operator        ::= "+" | "-" | "*" | "/" | ">" | "<" | "==" | ">=" | "<="
-BinaryExpressions ::= (BinaryExpression Operator)+ Ignored (Variable | Number) // eg: 1: (2 + 1 +) 3   2: ((2 + 1 +) (5 + 6 -)) 3
+// BinaryExpression::= (Variable | Number) Ignored Operator1 Ignored (Variable | Number)
+Compare        ::= ">" | "<" | "==" | ">=" | "<="
+Operator1        ::= "+" | "-"
+Operator2        ::= "*" | "/"
+Expressions ::= Term Expressions_tail
+Expressions_tail ::= (Operator1 Term)? // 0个或一个
+Term            ::= Factor Term_tail
+Term_tail       ::= (Operator2 Factor)? // 0个或一个
+Factor          ::= Number | "(" Expressions ")"
 FunctionDeclaration ::= "func" Ignored Name Ignored "(" Variable ("," Variable)* ")" BlockStatement // eg: 1: func foo ($a) {}  2: func foo ($a[,$b][,$c]) {}   ("," Variable)*这部分是一个或多个
 BlockStatement  ::= "{" Ignored (IfStatement | CallFunction | Print | Assignment | ReturnStatement ) Ignored "}"
-ReturnStatement ::= "return" (BinaryExpression | Variable)
+ReturnStatement ::= "return" (Expressions | Variable)
 CallFunction    ::= Name "(" (Variable | Number) ("," (Variable | Number))* ")" Ignored
 IfStatement     ::= "if" Ignored "(" Variable Ignored Operator Ignored Variable ")" Ignored BlockStatement Ignored "else" Ignored BlockStatement Ignored
 
