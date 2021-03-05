@@ -33,7 +33,11 @@ CallFunction    ::= Name "(" (Variable | Number) ("," (Variable | Number))* ")" 
 IfStatement     ::= "if" Ignored "(" Variable Ignored Operator Ignored Variable ")" Ignored BlockStatement Ignored "else" Ignored BlockStatement Ignored
 
 ```
+pineapple-ts移植于[pineapple language Go语言版本](https://github.com/karminski/pineapple)，后以移植初版(pineapple-ts)为蓝本，实现后续功能。
 
+Pineapple-ts is transplanted to the pineapple language Go language version, and then the original version of pineapple-ts is transplanted as the model to achieve the follow-up functions.
+
+## pineapple(Go 语言版本)
 TypeScript implementation of pineapple language (https://github.com/karminski/pineapple) as a personal exercise.
 
 [karminski/pineapple](https://github.com/karminski/pineapple)
@@ -63,7 +67,7 @@ npm run test
 - [liulinboyi](https://github.com/liulinboyi)
 
 
-# 最后把代码转成[JavaScript的AST](https://astexplorer.net/)然后使用[javascript的解释器canjs](https://github.com/jrainlau/canjs)执行代码.
+# 最后把代码转成[JavaScript的AST](https://astexplorer.net/)，然后使用[javascript的解释器canjs](https://github.com/jrainlau/canjs)执行代码.
 
 # 最后算是完成大部分了，实现了递归调用，解决了求斐波那契数问题。
 
