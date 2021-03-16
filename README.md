@@ -73,7 +73,6 @@ npm run test
 
 ```
 # 求斐波那契数
-# 求斐波那契数
 func Fibonacci($a) {
 
 	if($a == 0) {
