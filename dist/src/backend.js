@@ -8,7 +8,8 @@ const parser_1 = require("./parser");
 const Assignment_1 = require("./parser/Assignment");
 const Print_1 = require("./parser/Print");
 const Comment_1 = require("./parser/Comment");
-const index_js_1 = __importDefault(require("../vm/index.js"));
+// import Canjs from '../vm/index.js'
+const vm_1 = __importDefault(require("../vm.js/vm"));
 let GlobalVariables = {
     Variables: {}
 };
@@ -31,8 +32,21 @@ function Execute(code) {
     // console.log(JSON.stringify(ast, null, 4), '\r\rAST')
     // console.log("--------------------------------------------")
     // resolve
-    const vm = new index_js_1.default(ast);
-    vm.run();
+    // const vm = new Canjs(ast);
+    // vm.run()
+    ast.sourceType = "module";
+    let outast = {
+        program: ast,
+        type: "File"
+    };
+    const sanbox = { console: console };
+    const context = vm_1.default.createContext(sanbox);
+    try {
+        vm_1.default.runInContext(outast, "", context);
+    }
+    catch (err) {
+        console.error(err);
+    }
     // resolveAST(g, ast)
 }
 exports.Execute = Execute;

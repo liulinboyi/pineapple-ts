@@ -5,12 +5,14 @@ const lexer1_1 = require("../lexer1");
 const parser_1 = require("../parser");
 const Assignment_1 = require("./Assignment");
 const IfStatement_1 = require("./IfStatement");
+const ForOfStatement_1 = require("./ForOfStatement");
 const Print_1 = require("./Print");
 function parseFunction(lexer) {
     const FunctionDeclaration = {
         type: "FunctionDeclaration",
         id: {
             type: "Identifier",
+            // name: ""
         },
         params: [
         // {
@@ -97,6 +99,11 @@ function paseBlock(lexer, BlockStatementBody) {
     else if (ahead.tokenType === lexer1_1.TOKEN_IF) {
         const IfStatement = IfStatement_1.parseIfStatement(lexer);
         BlockStatementBody.push(IfStatement);
+        paseBlock(lexer, BlockStatementBody);
+    }
+    else if (ahead.tokenType === lexer1_1.TOKEN_FOR) {
+        const ForStatement = ForOfStatement_1.parseForStatement(lexer);
+        BlockStatementBody.push(ForStatement);
         paseBlock(lexer, BlockStatementBody);
     }
     // else if (ahead.tokenType === TOKEN_NAME) {

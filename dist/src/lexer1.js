@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NewLexer = exports.Lexer = exports.tokenNameMap = exports.keywords = exports.TOKEN_IF = exports.TOKEN_FUNC_PARAMS_DIV = exports.TOKEN_RETURN = exports.BLOCK_END = exports.BLOCK_START = exports.TOKEN_FUNC = exports.Operator = exports.SourceCharacter = exports.COMMENT = exports.STRING = exports.NUMBER = exports.INTERGER = exports.TOKEN_IGNORED = exports.TOKEN_PRINT = exports.TOKEN_NAME = exports.TOKEN_DUOQUOTE = exports.TOKEN_QUOTE = exports.TOKEN_EQUAL = exports.TOKEN_RIGHT_PAREN = exports.TOKEN_LEFT_PAREN = exports.TOKEN_VAR_PREFIX = exports.TOKEN_EOF = exports.Tokens = void 0;
+exports.NewLexer = exports.Lexer = exports.tokenNameMap = exports.keywords = exports.TOKEN_OF = exports.TOKEN_FOR = exports.TOKEN_IF = exports.TOKEN_FUNC_PARAMS_DIV = exports.TOKEN_RETURN = exports.BLOCK_END = exports.BLOCK_START = exports.TOKEN_FUNC = exports.Operator = exports.SourceCharacter = exports.COMMENT = exports.STRING = exports.NUMBER = exports.INTERGER = exports.TOKEN_IGNORED = exports.TOKEN_PRINT = exports.TOKEN_NAME = exports.TOKEN_DUOQUOTE = exports.TOKEN_QUOTE = exports.TOKEN_EQUAL = exports.TOKEN_RIGHT_PAREN = exports.TOKEN_LEFT_PAREN = exports.TOKEN_VAR_PREFIX = exports.TOKEN_EOF = exports.Tokens = void 0;
 // token const
 var Tokens;
 (function (Tokens) {
@@ -26,14 +26,18 @@ var Tokens;
     Tokens[Tokens["TOKEN_RETURN"] = 19] = "TOKEN_RETURN";
     Tokens[Tokens["TOKEN_FUNC_PARAMS_DIV"] = 20] = "TOKEN_FUNC_PARAMS_DIV";
     Tokens[Tokens["TOKEN_IF"] = 21] = "TOKEN_IF";
+    Tokens[Tokens["TOKEN_FOR"] = 22] = "TOKEN_FOR";
+    Tokens[Tokens["TOKEN_OF"] = 23] = "TOKEN_OF";
 })(Tokens = exports.Tokens || (exports.Tokens = {}));
-exports.TOKEN_EOF = Tokens.TOKEN_EOF, exports.TOKEN_VAR_PREFIX = Tokens.TOKEN_VAR_PREFIX, exports.TOKEN_LEFT_PAREN = Tokens.TOKEN_LEFT_PAREN, exports.TOKEN_RIGHT_PAREN = Tokens.TOKEN_RIGHT_PAREN, exports.TOKEN_EQUAL = Tokens.TOKEN_EQUAL, exports.TOKEN_QUOTE = Tokens.TOKEN_QUOTE, exports.TOKEN_DUOQUOTE = Tokens.TOKEN_DUOQUOTE, exports.TOKEN_NAME = Tokens.TOKEN_NAME, exports.TOKEN_PRINT = Tokens.TOKEN_PRINT, exports.TOKEN_IGNORED = Tokens.TOKEN_IGNORED, exports.INTERGER = Tokens.INTERGER, exports.NUMBER = Tokens.NUMBER, exports.STRING = Tokens.STRING, exports.COMMENT = Tokens.COMMENT, exports.SourceCharacter = Tokens.SourceCharacter, exports.Operator = Tokens.Operator, exports.TOKEN_FUNC = Tokens.TOKEN_FUNC, exports.BLOCK_START = Tokens.BLOCK_START, exports.BLOCK_END = Tokens.BLOCK_END, exports.TOKEN_RETURN = Tokens.TOKEN_RETURN, exports.TOKEN_FUNC_PARAMS_DIV = Tokens.TOKEN_FUNC_PARAMS_DIV, exports.TOKEN_IF = Tokens.TOKEN_IF;
+exports.TOKEN_EOF = Tokens.TOKEN_EOF, exports.TOKEN_VAR_PREFIX = Tokens.TOKEN_VAR_PREFIX, exports.TOKEN_LEFT_PAREN = Tokens.TOKEN_LEFT_PAREN, exports.TOKEN_RIGHT_PAREN = Tokens.TOKEN_RIGHT_PAREN, exports.TOKEN_EQUAL = Tokens.TOKEN_EQUAL, exports.TOKEN_QUOTE = Tokens.TOKEN_QUOTE, exports.TOKEN_DUOQUOTE = Tokens.TOKEN_DUOQUOTE, exports.TOKEN_NAME = Tokens.TOKEN_NAME, exports.TOKEN_PRINT = Tokens.TOKEN_PRINT, exports.TOKEN_IGNORED = Tokens.TOKEN_IGNORED, exports.INTERGER = Tokens.INTERGER, exports.NUMBER = Tokens.NUMBER, exports.STRING = Tokens.STRING, exports.COMMENT = Tokens.COMMENT, exports.SourceCharacter = Tokens.SourceCharacter, exports.Operator = Tokens.Operator, exports.TOKEN_FUNC = Tokens.TOKEN_FUNC, exports.BLOCK_START = Tokens.BLOCK_START, exports.BLOCK_END = Tokens.BLOCK_END, exports.TOKEN_RETURN = Tokens.TOKEN_RETURN, exports.TOKEN_FUNC_PARAMS_DIV = Tokens.TOKEN_FUNC_PARAMS_DIV, exports.TOKEN_IF = Tokens.TOKEN_IF, exports.TOKEN_FOR = Tokens.TOKEN_FOR, exports.TOKEN_OF = Tokens.TOKEN_OF;
 // regex match patterns
 const regexName = /^[_\d\w]+/;
 // 关键字
 exports.keywords = {
     "print": exports.TOKEN_PRINT,
     "if": exports.TOKEN_IF,
+    "for": exports.TOKEN_FOR,
+    "of": exports.TOKEN_OF
 };
 exports.tokenNameMap = {
     [exports.TOKEN_EOF]: "EOF",
@@ -58,6 +62,8 @@ exports.tokenNameMap = {
     [exports.TOKEN_RETURN]: "TOKEN_RETURN",
     [exports.TOKEN_FUNC_PARAMS_DIV]: "TOKEN_FUNC_PARAMS_DIV",
     [exports.TOKEN_IF]: "if",
+    [exports.TOKEN_FOR]: "for",
+    [exports.TOKEN_OF]: "of",
 };
 class Lexer {
     constructor(sourceCode, lineNum, nextToken, nextTokenType, nextTokenLineNum) {

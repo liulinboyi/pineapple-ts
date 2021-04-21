@@ -3,7 +3,8 @@ import { GlobalVariables } from './definition'
 import { Assignment } from "./parser/Assignment"
 import { Print } from "./parser/Print"
 import { Comment } from "./parser/Comment"
-import Canjs from '../vm/index.js'
+// import Canjs from '../vm/index.js'
+import vm from "../vm.js/vm";
 
 let GlobalVariables: GlobalVariables = {
     Variables: {}
@@ -36,8 +37,25 @@ export function Execute(code: string) {
     // console.log("--------------------------------------------")
 
     // resolve
-    const vm = new Canjs(ast);
-    vm.run()
+    // const vm = new Canjs(ast);
+    // vm.run()
+
+    ast.sourceType = "module"
+    let outast = {
+        program: ast,
+        type: "File"
+    }
+
+    const sanbox = { console: console };
+
+    const context = vm.createContext(sanbox);
+
+    try {
+        vm.runInContext(outast, "", context);
+    } catch (err) {
+        console.error(err);
+    }
+
     // resolveAST(g, ast)
 }
 

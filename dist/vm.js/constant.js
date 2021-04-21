@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ANONYMOUS = exports.NEW = exports.ARGUMENTS = exports.UNDEFINED = exports.REQUIRE = exports.EXPORTS = exports.MODULE = exports.THIS = void 0;
+exports.THIS = "this";
+exports.MODULE = "module";
+exports.EXPORTS = "exports";
+exports.REQUIRE = "require";
+exports.UNDEFINED = "undefined";
+exports.ARGUMENTS = "arguments";
+exports.NEW = "new";
+exports.ANONYMOUS = "anonymous";

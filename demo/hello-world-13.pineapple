@@ -1,0 +1,8 @@
+func test() {
+    $a = "123"
+    for($i of $a) {
+        print($i)
+    }
+}
+
+test()

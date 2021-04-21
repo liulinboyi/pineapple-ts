@@ -24,7 +24,8 @@ TOKEN_QUOTE, // "
 TOKEN_DUOQUOTE, // ""
 TOKEN_NAME, // Name ::= [_A-Za-z][_0-9A-Za-z]*
 TOKEN_PRINT, // print
-TOKEN_IGNORED, } = Tokens;
+TOKEN_IGNORED, // Ignored  
+ } = Tokens;
 exports.tokenNameMap = {
     [TOKEN_EOF]: "EOF",
     [TOKEN_VAR_PREFIX]: "$",

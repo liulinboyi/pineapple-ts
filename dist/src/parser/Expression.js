@@ -11,6 +11,7 @@ function parseExpression(lexer) {
             type: "CallExpression",
             callee: {
                 type: "Identifier",
+                // name: ""
             },
             arguments: []
         }

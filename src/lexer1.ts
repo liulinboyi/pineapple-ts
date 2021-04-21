@@ -62,8 +62,10 @@ export enum Tokens {
     BLOCK_START,              // {
     BLOCK_END,                // }
     TOKEN_RETURN,             // return
-    TOKEN_FUNC_PARAMS_DIV,     // ,
-    TOKEN_IF,                  // if
+    TOKEN_FUNC_PARAMS_DIV,    // ,
+    TOKEN_IF,                 // if
+    TOKEN_FOR,                // for
+    TOKEN_OF,                 // of
 }
 
 export const {
@@ -88,7 +90,9 @@ export const {
     BLOCK_END,                // }
     TOKEN_RETURN,             // return
     TOKEN_FUNC_PARAMS_DIV,    // ,
-    TOKEN_IF,                  // if
+    TOKEN_IF,                 // if
+    TOKEN_FOR,                // for
+    TOKEN_OF,                 // of
 } = Tokens
 
 // regex match patterns
@@ -98,6 +102,8 @@ const regexName = /^[_\d\w]+/
 export const keywords: Keywords = {
     "print": TOKEN_PRINT,
     "if": TOKEN_IF,
+    "for": TOKEN_FOR,
+    "of": TOKEN_OF
 }
 
 export const tokenNameMap: TokenNameMap = {
@@ -123,6 +129,8 @@ export const tokenNameMap: TokenNameMap = {
     [TOKEN_RETURN]: "TOKEN_RETURN",
     [TOKEN_FUNC_PARAMS_DIV]: "TOKEN_FUNC_PARAMS_DIV",
     [TOKEN_IF]: "if",
+    [TOKEN_FOR]: "for",
+    [TOKEN_OF]: "of",
 }
 
 export class Lexer {
