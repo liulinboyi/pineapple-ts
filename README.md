@@ -1,9 +1,11 @@
 # pineapple-ts
 
-## 敏捷开发，主要是思路，细节不是很完美
+## [移植初版分支在这里！](https://github.com/liulinboyi/pineapple-ts/tree/0.0.1)
 
-## 可以用[在线解析EBNF](https://bottlecaps.de/rr/ui)
-## EBNF：
+### 敏捷开发，主要是思路，细节不是很完美
+
+### 可以用[在线解析EBNF](https://bottlecaps.de/rr/ui)
+### EBNF：
 ```
 SourceCharacter ::=  #x0009 | #x000A | #x000D | [#x0020-#xFFFF] // 大部分的 Unicode 
 Name            ::= [_A-Za-z][_0-9A-Za-z]* // 标识符名称第一部分只能出现一次，后面部分零次或多次 
@@ -67,9 +69,9 @@ npm run test
 - [liulinboyi](https://github.com/liulinboyi)
 
 
-# 最后把代码转成[JavaScript的AST](https://astexplorer.net/)，然后使用[javascript的解释器canjs](https://github.com/jrainlau/canjs)执行代码.
+#### 最后把代码转成[JavaScript的AST](https://astexplorer.net/)，然后使用[javascript的解释器canjs](https://github.com/jrainlau/canjs)执行代码.
 
-# 最后算是完成大部分了，实现了递归调用，解决了求斐波那契数问题。
+#### 最后算是完成大部分了，实现了递归调用，解决了求斐波那契数问题。
 
 ```
 # 求斐波那契数
@@ -102,7 +104,7 @@ $res = Fibonacci(7)
 
 print($res)
 ```
-# 对应JavaScript中的代码如下
+## 对应JavaScript中的代码如下
 ```javascript
 // 求斐波那契数
 function Fibonacci($a) {
