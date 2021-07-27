@@ -271,6 +271,8 @@ export function parseBinaryExpression(lexer: Lexer, idAndinit: { init: Literal |
         BinaryExpression.left = new Identifier((idAndinit.init as Identifier).name)
     } else if (leftType === 'Literal') {
         BinaryExpression.left = new Literal((idAndinit.init as Literal).value)
+    } else if (leftType === "BinaryExpression") {
+        BinaryExpression.left = idAndinit.init
     }
     if (ahead.tokenType === NUMBER) {
         const literial = new Literal(parseNumber(lexer))
@@ -286,5 +288,17 @@ export function parseBinaryExpression(lexer: Lexer, idAndinit: { init: Literal |
     VariableDeclarator.id.name = idAndinit.id.name;
     VariableDeclarator.init = BinaryExpression;
     (assignment as any).declarations.push(VariableDeclarator)
+
+    let oahead = lexer.LookAhead()
+
+    if (oahead.tokenType === Operator) {
+        lexer.NextTokenIs(Operator); // +-*/
+        // lexer.LookAheadAndSkip(TOKEN_IGNORED); // 空格
+        lexer.isIgnored()
+        const idAndinits = (assignment as any).declarations.pop();
+        parseBinaryExpression(lexer, idAndinits, assignment, "BinaryExpression");
+    }
+
+
     return assignment
 }

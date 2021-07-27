@@ -231,6 +231,9 @@ function parseBinaryExpression(lexer, idAndinit, assignment, leftType) {
     else if (leftType === 'Literal') {
         BinaryExpression.left = new Literal(idAndinit.init.value);
     }
+    else if (leftType === "BinaryExpression") {
+        BinaryExpression.left = idAndinit.init;
+    }
     if (ahead.tokenType === lexer1_1.NUMBER) {
         const literial = new Literal(parser_1.parseNumber(lexer));
         BinaryExpression.right = literial;
@@ -245,6 +248,14 @@ function parseBinaryExpression(lexer, idAndinit, assignment, leftType) {
     VariableDeclarator.id.name = idAndinit.id.name;
     VariableDeclarator.init = BinaryExpression;
     assignment.declarations.push(VariableDeclarator);
+    let oahead = lexer.LookAhead();
+    if (oahead.tokenType === lexer1_1.Operator) {
+        lexer.NextTokenIs(lexer1_1.Operator); // +-*/
+        // lexer.LookAheadAndSkip(TOKEN_IGNORED); // 空格
+        lexer.isIgnored();
+        const idAndinits = assignment.declarations.pop();
+        parseBinaryExpression(lexer, idAndinits, assignment, "BinaryExpression");
+    }
     return assignment;
 }
 exports.parseBinaryExpression = parseBinaryExpression;
