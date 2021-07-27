@@ -98,18 +98,11 @@ export function parseAssignment(lexer: Lexer) {
             const expression = parseExpression(lexer)
             VariableDeclarator.init = expression.expression
             assignment.type = "VariableDeclaration"
-        } else if (tokenType === NUMBER) {
+        } else if (tokenType === NUMBER || tokenType === TOKEN_LEFT_PAREN) {
             // 需要Expressions处理
             let ex = new BinaryExpression('')
-            const lineNumber = lexer.GetLineNum()
-            while (lexer.GetLineNum() === lineNumber) {
-                const expr = Expressions(lexer, ex)
-                ex = expr
-                // ex.left = expr;
-                // let ahead = lexer.LookAhead()
-                // ex.operator = ahead.token
-                console.log(expr)
-            }
+            const expr = Expressions(lexer, ex)
+            ex = expr
             console.log(ex)
             // const literial = new Literal(parseNumber(lexer)) // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = ex
@@ -201,9 +194,14 @@ export function Trem_tail(lexer: Lexer, value: any) {
 export function Factor(lexer: Lexer, expr?: any) {
     let ahead = lexer.LookAhead()
     if (lexer.isNumber(ahead.token)) {
-        lexer.NextTokenIs(NUMBER)
-        lexer.LookAheadAndSkip(TOKEN_IGNORED)
-        return new Literal(+ahead.token)
+        let token = ""
+        while (lexer.isNumber(ahead.token)) {
+            token += ahead.token
+            lexer.NextTokenIs(NUMBER);
+            ahead = lexer.LookAhead();
+        }
+        lexer.LookAheadAndSkip(TOKEN_IGNORED);
+        return new Literal(+token); // 转换为数字
     } else if (ahead.token === "(") {
         // (1 + 2)
         lexer.NextTokenIs(TOKEN_LEFT_PAREN)

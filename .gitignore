@@ -8,3 +8,5 @@
 /dist/test/*.js.map
 /dist/src/*/*.js.map
 /dist/vm/*/*.js.map
+/vm.js/*
+/vm.ts/build/*

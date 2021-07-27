@@ -75,18 +75,11 @@ function parseAssignment(lexer) {
             VariableDeclarator.init = expression.expression;
             assignment.type = "VariableDeclaration";
         }
-        else if (tokenType === lexer1_1.NUMBER) {
+        else if (tokenType === lexer1_1.NUMBER || tokenType === lexer1_1.TOKEN_LEFT_PAREN) {
             // 需要Expressions处理
             let ex = new BinaryExpression('');
-            const lineNumber = lexer.GetLineNum();
-            while (lexer.GetLineNum() === lineNumber) {
-                const expr = Expressions(lexer, ex);
-                ex = expr;
-                // ex.left = expr;
-                // let ahead = lexer.LookAhead()
-                // ex.operator = ahead.token
-                console.log(expr);
-            }
+            const expr = Expressions(lexer, ex);
+            ex = expr;
             console.log(ex);
             // const literial = new Literal(parseNumber(lexer)) // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = ex;
@@ -180,9 +173,14 @@ exports.Trem_tail = Trem_tail;
 function Factor(lexer, expr) {
     let ahead = lexer.LookAhead();
     if (lexer.isNumber(ahead.token)) {
-        lexer.NextTokenIs(lexer1_1.NUMBER);
+        let token = "";
+        while (lexer.isNumber(ahead.token)) {
+            token += ahead.token;
+            lexer.NextTokenIs(lexer1_1.NUMBER);
+            ahead = lexer.LookAhead();
+        }
         lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
-        return new Literal(+ahead.token);
+        return new Literal(+token); // 转换为数字
     }
     else if (ahead.token === "(") {
         // (1 + 2)

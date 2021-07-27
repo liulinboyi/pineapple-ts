@@ -17,6 +17,6 @@ const visitors: IEcmaScriptMap = {
 
 export default function evaluate(path: Path<types.Node>) {
   path.evaluate = evaluate;
-  const handler = visitors[path.node.type];
+  const handler = (visitors as any)[path.node.type];
   return handler(path);
 }

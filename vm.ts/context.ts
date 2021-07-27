@@ -169,7 +169,7 @@ export class Context {
     for (const attr in ctx) {
       /* istanbul ignore next */
       if (ctx.hasOwnProperty(attr)) {
-        this[attr] = ctx[attr];
+        (this as any)[attr] = ctx[attr];
       }
     }
   }

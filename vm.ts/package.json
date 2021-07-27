@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "build": "rm -rf ./build/ && tsc"
+    }
+}
