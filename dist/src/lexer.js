@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NewLexer = exports.Lexer = exports.keywords = exports.tokenNameMap = exports.Tokens = void 0;
+exports.NewLexer = exports.Lexer = exports.tokenNameMap = exports.keywords = exports.TOKEN_OF = exports.TOKEN_FOR = exports.TOKEN_IF = exports.TOKEN_FUNC_PARAMS_DIV = exports.TOKEN_RETURN = exports.BLOCK_END = exports.BLOCK_START = exports.TOKEN_FUNC = exports.Operator = exports.SourceCharacter = exports.COMMENT = exports.STRING = exports.NUMBER = exports.INTERGER = exports.TOKEN_IGNORED = exports.TOKEN_PRINT = exports.TOKEN_NAME = exports.TOKEN_DUOQUOTE = exports.TOKEN_QUOTE = exports.TOKEN_EQUAL = exports.TOKEN_RIGHT_PAREN = exports.TOKEN_LEFT_PAREN = exports.TOKEN_VAR_PREFIX = exports.TOKEN_EOF = exports.Tokens = void 0;
 // token const
 var Tokens;
 (function (Tokens) {
@@ -14,42 +14,97 @@ var Tokens;
     Tokens[Tokens["TOKEN_NAME"] = 7] = "TOKEN_NAME";
     Tokens[Tokens["TOKEN_PRINT"] = 8] = "TOKEN_PRINT";
     Tokens[Tokens["TOKEN_IGNORED"] = 9] = "TOKEN_IGNORED";
+    Tokens[Tokens["INTERGER"] = 10] = "INTERGER";
+    Tokens[Tokens["NUMBER"] = 11] = "NUMBER";
+    Tokens[Tokens["STRING"] = 12] = "STRING";
+    Tokens[Tokens["COMMENT"] = 13] = "COMMENT";
+    Tokens[Tokens["SourceCharacter"] = 14] = "SourceCharacter";
+    Tokens[Tokens["Operator"] = 15] = "Operator";
+    Tokens[Tokens["TOKEN_FUNC"] = 16] = "TOKEN_FUNC";
+    Tokens[Tokens["BLOCK_START"] = 17] = "BLOCK_START";
+    Tokens[Tokens["BLOCK_END"] = 18] = "BLOCK_END";
+    Tokens[Tokens["TOKEN_RETURN"] = 19] = "TOKEN_RETURN";
+    Tokens[Tokens["TOKEN_FUNC_PARAMS_DIV"] = 20] = "TOKEN_FUNC_PARAMS_DIV";
+    Tokens[Tokens["TOKEN_IF"] = 21] = "TOKEN_IF";
+    Tokens[Tokens["TOKEN_FOR"] = 22] = "TOKEN_FOR";
+    Tokens[Tokens["TOKEN_OF"] = 23] = "TOKEN_OF";
 })(Tokens = exports.Tokens || (exports.Tokens = {}));
-const { TOKEN_EOF, // end-of-file
-TOKEN_VAR_PREFIX, // $
-TOKEN_LEFT_PAREN, // (
-TOKEN_RIGHT_PAREN, // )
-TOKEN_EQUAL, // =
-TOKEN_QUOTE, // "
-TOKEN_DUOQUOTE, // ""
-TOKEN_NAME, // Name ::= [_A-Za-z][_0-9A-Za-z]*
-TOKEN_PRINT, // print
-TOKEN_IGNORED, // Ignored  
- } = Tokens;
-exports.tokenNameMap = {
-    [TOKEN_EOF]: "EOF",
-    [TOKEN_VAR_PREFIX]: "$",
-    [TOKEN_LEFT_PAREN]: "(",
-    [TOKEN_RIGHT_PAREN]: ")",
-    [TOKEN_EQUAL]: "=",
-    [TOKEN_QUOTE]: "\"",
-    [TOKEN_DUOQUOTE]: "\"\"",
-    [TOKEN_NAME]: "Name",
-    [TOKEN_PRINT]: "print",
-    [TOKEN_IGNORED]: "Ignored",
-};
-exports.keywords = {
-    "print": TOKEN_PRINT,
-};
+exports.TOKEN_EOF = Tokens.TOKEN_EOF, exports.TOKEN_VAR_PREFIX = Tokens.TOKEN_VAR_PREFIX, exports.TOKEN_LEFT_PAREN = Tokens.TOKEN_LEFT_PAREN, exports.TOKEN_RIGHT_PAREN = Tokens.TOKEN_RIGHT_PAREN, exports.TOKEN_EQUAL = Tokens.TOKEN_EQUAL, exports.TOKEN_QUOTE = Tokens.TOKEN_QUOTE, exports.TOKEN_DUOQUOTE = Tokens.TOKEN_DUOQUOTE, exports.TOKEN_NAME = Tokens.TOKEN_NAME, exports.TOKEN_PRINT = Tokens.TOKEN_PRINT, exports.TOKEN_IGNORED = Tokens.TOKEN_IGNORED, exports.INTERGER = Tokens.INTERGER, exports.NUMBER = Tokens.NUMBER, exports.STRING = Tokens.STRING, exports.COMMENT = Tokens.COMMENT, exports.SourceCharacter = Tokens.SourceCharacter, exports.Operator = Tokens.Operator, exports.TOKEN_FUNC = Tokens.TOKEN_FUNC, exports.BLOCK_START = Tokens.BLOCK_START, exports.BLOCK_END = Tokens.BLOCK_END, exports.TOKEN_RETURN = Tokens.TOKEN_RETURN, exports.TOKEN_FUNC_PARAMS_DIV = Tokens.TOKEN_FUNC_PARAMS_DIV, exports.TOKEN_IF = Tokens.TOKEN_IF, exports.TOKEN_FOR = Tokens.TOKEN_FOR, exports.TOKEN_OF = Tokens.TOKEN_OF;
 // regex match patterns
 const regexName = /^[_\d\w]+/;
+// 关键字
+exports.keywords = {
+    "print": exports.TOKEN_PRINT,
+    "if": exports.TOKEN_IF,
+    "for": exports.TOKEN_FOR,
+    "of": exports.TOKEN_OF
+};
+exports.tokenNameMap = {
+    [exports.TOKEN_EOF]: "EOF",
+    [exports.TOKEN_VAR_PREFIX]: "$",
+    [exports.TOKEN_LEFT_PAREN]: "(",
+    [exports.TOKEN_RIGHT_PAREN]: ")",
+    [exports.TOKEN_EQUAL]: "=",
+    [exports.TOKEN_QUOTE]: "\"",
+    [exports.TOKEN_DUOQUOTE]: "\"\"",
+    [exports.TOKEN_NAME]: "Name",
+    [exports.TOKEN_PRINT]: "print",
+    [exports.TOKEN_IGNORED]: "Ignored",
+    [exports.INTERGER]: "INTERGER",
+    [exports.NUMBER]: "NUMBER",
+    [exports.STRING]: "STRING",
+    [exports.COMMENT]: "COMMENT",
+    [exports.SourceCharacter]: "SourceCharacter",
+    [exports.Operator]: "Operator",
+    [exports.TOKEN_FUNC]: "TOKEN_FUNC",
+    [exports.BLOCK_START]: "BLOCK_START",
+    [exports.BLOCK_END]: "BLOCK_END",
+    [exports.TOKEN_RETURN]: "TOKEN_RETURN",
+    [exports.TOKEN_FUNC_PARAMS_DIV]: "TOKEN_FUNC_PARAMS_DIV",
+    [exports.TOKEN_IF]: "if",
+    [exports.TOKEN_FOR]: "for",
+    [exports.TOKEN_OF]: "of",
+};
 class Lexer {
     constructor(sourceCode, lineNum, nextToken, nextTokenType, nextTokenLineNum) {
         this.sourceCode = sourceCode;
         this.lineNum = lineNum;
         this.nextToken = nextToken;
         this.nextTokenType = nextTokenType;
-        this.nextTokenLineNum = nextTokenLineNum;
+        this.hasCache = false;
+    }
+    /**
+     * LookAhead (向前看) 一个 Token, 告诉我们下一个 Token 是什么
+     * @returns
+     */
+    LookAhead() {
+        // lexer.nextToken already setted
+        if (this.hasCache) {
+            return { tokenType: this.nextTokenType, lineNum: this.lineNum, token: this.nextToken };
+            // return this.nextTokenType
+        }
+        // set it
+        // 当前行
+        let { lineNum, tokenType, token } = this.GetNextToken();
+        // *
+        // 下一行
+        this.hasCache = true;
+        this.lineNum = lineNum;
+        this.nextTokenType = tokenType;
+        this.nextToken = token;
+        return { tokenType, lineNum, token };
+    }
+    LookAheadAndSkip(expectedType) {
+        // get next token
+        // 查看看下一个Token信息
+        let { lineNum, tokenType, token } = this.GetNextToken();
+        // not is expected type, reverse cursor
+        if (tokenType != expectedType) {
+            this.hasCache = true;
+            this.lineNum = lineNum;
+            this.nextTokenType = tokenType;
+            this.nextToken = token;
+        }
     }
     /**
     * 断言下一个 Token 是什么
@@ -65,12 +120,12 @@ class Lexer {
     // MatchToken() 的封装，每一次调用，都会吃掉相应Token
     GetNextToken() {
         // next token already loaded
-        if (this.nextTokenLineNum > 0) {
-            let lineNum = this.nextTokenLineNum;
+        if (this.hasCache) {
+            // 在LookAhead和LookAheadSkip处对nextTokenLineNum进行了赋值操作
+            let lineNum = this.lineNum;
             let tokenType = this.nextTokenType;
             let token = this.nextToken;
-            this.lineNum = this.nextTokenLineNum;
-            this.nextTokenLineNum = 0;
+            this.hasCache = false;
             return {
                 lineNum,
                 tokenType,
@@ -79,40 +134,105 @@ class Lexer {
         }
         return this.MatchToken();
     }
+    checkCode(c) {
+        // 确保源代码，不包含非法字符，对应着SourceCharacter的EBNF
+        if (!/\u0009|\u000A|\u000D|[\u0020-\uFFFF]/.test(this.sourceCode[0])) {
+            throw new Error('The source code contains characters that cannot be parsed.');
+        }
+    }
+    // 直接跳过几个字符，返回被跳过的字符
+    next(skip) {
+        this.checkCode(this.sourceCode[0]);
+        const code = this.sourceCode[0];
+        this.skipSourceCode(skip);
+        return code;
+    }
     // 匹配Token并跳过匹配的Token
     MatchToken() {
+        this.checkCode(this.sourceCode[0]); // 只做检查，不吃字符
         // check ignored
         if (this.isIgnored()) {
-            return { lineNum: this.lineNum, tokenType: TOKEN_IGNORED, token: "Ignored" };
+            return { lineNum: this.lineNum, tokenType: exports.TOKEN_IGNORED, token: "Ignored" };
         }
         // finish
         if (this.sourceCode.length == 0) {
-            return { lineNum: this.lineNum, tokenType: TOKEN_EOF, token: exports.tokenNameMap[TOKEN_EOF] };
+            return { lineNum: this.lineNum, tokenType: exports.TOKEN_EOF, token: exports.tokenNameMap[exports.TOKEN_EOF] };
         }
+        // 如果nextTokenType是#，并且字符串能匹配上，则表示是源代码字符串
+        // if (this.sourceCode[0].match(/\*/)) {
+        //     return { lineNum: this.lineNum, tokenType: SourceCharacter, token: tokenNameMap[SourceCharacter] }
+        // }
         // check token
         switch (this.sourceCode[0]) {
             case '$':
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: TOKEN_VAR_PREFIX, token: "$" };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_VAR_PREFIX, token: "$" };
             case '(':
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: TOKEN_LEFT_PAREN, token: "(" };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_LEFT_PAREN, token: "(" };
             case ')':
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: TOKEN_RIGHT_PAREN, token: ")" };
-            case '=':
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_RIGHT_PAREN, token: ")" };
+            case '=': // =
+                if (this.sourceCode[1] === "=") { // ==
+                    this.skipSourceCode(2);
+                    return { lineNum: this.lineNum, tokenType: exports.Operator, token: "==" };
+                }
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: TOKEN_EQUAL, token: "=" };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_EQUAL, token: "=" };
             case '"':
                 if (this.nextSourceCodeIs("\"\"")) {
                     this.skipSourceCode(2);
-                    return { lineNum: this.lineNum, tokenType: TOKEN_DUOQUOTE, token: "\"\"" };
+                    return { lineNum: this.lineNum, tokenType: exports.TOKEN_DUOQUOTE, token: "\"\"" };
                 }
                 this.skipSourceCode(1);
-                return { lineNum: this.lineNum, tokenType: TOKEN_QUOTE, token: "\"" };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_QUOTE, token: "\"" };
+            case '#':
+                this.skipSourceCode(1);
+                return { lineNum: this.lineNum, tokenType: exports.COMMENT, token: "#" };
+            case ",":
+                this.skipSourceCode(1);
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_FUNC_PARAMS_DIV, token: "," };
+            case "{":
+                this.skipSourceCode(1);
+                return { lineNum: this.lineNum, tokenType: exports.BLOCK_START, token: "{" };
+            case "}":
+                this.skipSourceCode(1);
+                return { lineNum: this.lineNum, tokenType: exports.BLOCK_END, token: "}" };
+        }
+        // return
+        if (this.sourceCode[0] === 'r' && this.sourceCode.slice(0, 6) === 'return') {
+            this.skipSourceCode(6);
+            return { lineNum: this.lineNum, tokenType: exports.TOKEN_RETURN, token: "return" };
+        }
+        // func
+        if (this.sourceCode[0] === 'f' && this.sourceCode.slice(0, 4) === "func") {
+            this.skipSourceCode(4);
+            return { lineNum: this.lineNum, tokenType: exports.TOKEN_FUNC, token: "func" };
+        }
+        // Operator
+        const regexpResult = /\+|\-|\*|\//.exec(this.sourceCode[0]);
+        if (regexpResult) {
+            const op = regexpResult[0];
+            this.skipSourceCode(1);
+            return { lineNum: this.lineNum, tokenType: exports.Operator, token: op };
+        }
+        // Compare > < = >= <= ==
+        const Compare = /\>|\<|\=/.exec(this.sourceCode[0]);
+        if (Compare) {
+            const co = Compare[0];
+            this.skipSourceCode(1);
+            if (this.sourceCode[0] === "=") {
+                this.skipSourceCode(1);
+                return { lineNum: this.lineNum, tokenType: exports.Operator, token: `${co}=` };
+            }
+            else {
+                return { lineNum: this.lineNum, tokenType: exports.Operator, token: co };
+            }
         }
         // check multiple character token
         if (this.sourceCode[0] == '_' || this.isLetter(this.sourceCode[0])) {
+            // 扫描关键字
             let token = this.scanName();
             let tokenType = exports.keywords[token];
             let isMatch = tokenType !== undefined ? true : false;
@@ -120,11 +240,22 @@ class Lexer {
                 return { lineNum: this.lineNum, tokenType, token };
             }
             else {
-                return { lineNum: this.lineNum, tokenType: TOKEN_NAME, token };
+                return { lineNum: this.lineNum, tokenType: exports.TOKEN_NAME, token };
             }
+        }
+        if (this.isNumber(this.sourceCode[0])) {
+            const num = this.sourceCode[0];
+            this.skipSourceCode(1);
+            return { lineNum: this.lineNum, tokenType: exports.NUMBER, token: num };
         }
         // unexpected symbol
         throw new Error(`MatchToken(): unexpected symbol near '${this.sourceCode[0]}'.`);
+    }
+    isNumber(c) {
+        return this.isInterger(c);
+    }
+    isInterger(c) {
+        return /[0-9]/.test(c);
     }
     isLetter(c) {
         return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
@@ -134,6 +265,12 @@ class Lexer {
     }
     nextSourceCodeIs(s) {
         return this.sourceCode.startsWith(s);
+    }
+    isNewLine(c) {
+        return c == '\r' || c == '\n';
+    }
+    isEmpty() {
+        return this.sourceCode.length === 0;
     }
     isIgnored() {
         let isIgnored = false;
@@ -147,7 +284,7 @@ class Lexer {
             }
             return false;
         };
-        // matching
+        // matching 匹配isIgnored的情况，把isIgnored的字符都吃掉
         while (this.sourceCode.length > 0) {
             if (this.nextSourceCodeIs("\r\n") || this.nextSourceCodeIs("\n\r")) {
                 this.skipSourceCode(2);
@@ -188,42 +325,10 @@ class Lexer {
     GetLineNum() {
         return this.lineNum;
     }
-    /**
-     * LookAhead (向前看) 一个 Token, 告诉我们下一个 Token 是什么
-     * @returns
-     */
-    LookAhead() {
-        // lexer.nextToken already setted
-        if (this.nextTokenLineNum > 0) {
-            return this.nextTokenType;
-        }
-        // set it
-        // 当前行
-        let nowLineNum = this.lineNum;
-        let { lineNum, tokenType, token } = this.GetNextToken();
-        this.lineNum = nowLineNum;
-        // *
-        // 下一行
-        this.nextTokenLineNum = lineNum;
-        this.nextTokenType = tokenType;
-        this.nextToken = token;
-        return tokenType;
-    }
-    LookAheadAndSkip(expectedType) {
-        // get next token
-        let nowLineNum = this.lineNum;
-        // 查看看下一个Token信息
-        let { lineNum, tokenType, token } = this.GetNextToken();
-        // not is expected type, reverse cursor
-        if (tokenType != expectedType) {
-            this.lineNum = nowLineNum;
-            this.nextTokenLineNum = lineNum;
-            this.nextTokenType = tokenType;
-            this.nextToken = token;
-        }
-    }
     // return content before token
     scanBeforeToken(token) {
+        // 以单个双引号，划分数组
+        // 由于前面已经吃掉了一个单个双引了，此时处理如下 eg: 'aa"后面其他字符串'.split("\"")
         let s = this.sourceCode.split(token);
         if (s.length < 2) {
             console.log("unreachable!");

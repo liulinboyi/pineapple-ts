@@ -1,5 +1,5 @@
 import { Variable } from "../definition"
-import { Lexer, tokenNameMap, Tokens, TOKEN_IGNORED, TOKEN_LEFT_PAREN, TOKEN_PRINT, TOKEN_RIGHT_PAREN } from "../lexer1"
+import { Lexer, tokenNameMap, Tokens, TOKEN_IGNORED, TOKEN_LEFT_PAREN, TOKEN_PRINT, TOKEN_RIGHT_PAREN } from "../lexer"
 import { parseVariable } from "../parser"
 
 export interface Print {

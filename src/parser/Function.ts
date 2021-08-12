@@ -1,4 +1,4 @@
-import { TOKEN_IGNORED, TOKEN_LEFT_PAREN, Lexer, TOKEN_RIGHT_PAREN, TOKEN_FUNC_PARAMS_DIV, TOKEN_FUNC, BLOCK_START, TOKEN_RETURN, NUMBER, TOKEN_VAR_PREFIX, Operator, BLOCK_END, TOKEN_PRINT, TOKEN_IF, TOKEN_NAME, TOKEN_FOR } from "../lexer1";
+import { TOKEN_IGNORED, TOKEN_LEFT_PAREN, Lexer, TOKEN_RIGHT_PAREN, TOKEN_FUNC_PARAMS_DIV, TOKEN_FUNC, BLOCK_START, TOKEN_RETURN, NUMBER, TOKEN_VAR_PREFIX, Operator, BLOCK_END, TOKEN_PRINT, TOKEN_IF, TOKEN_NAME, TOKEN_FOR } from "../lexer";
 import { parseName, parseNumber, parseString, parseVariable } from "../parser";
 import { Assignment, Identifier, Literal, parseAssignment, parseBinaryExpression } from "./Assignment";
 import { parseExpression } from "./Expression";

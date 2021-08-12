@@ -1,4 +1,4 @@
-import { COMMENT, Lexer, NewLexer, NUMBER, tokenNameMap, TOKEN_DUOQUOTE, TOKEN_EOF, TOKEN_FUNC, TOKEN_IGNORED, TOKEN_NAME, TOKEN_PRINT, TOKEN_QUOTE, TOKEN_VAR_PREFIX } from "./lexer1"
+import { COMMENT, Lexer, NewLexer, NUMBER, tokenNameMap, TOKEN_DUOQUOTE, TOKEN_EOF, TOKEN_FUNC, TOKEN_IGNORED, TOKEN_NAME, TOKEN_PRINT, TOKEN_QUOTE, TOKEN_VAR_PREFIX } from "./lexer"
 import { Variable } from './definition'
 import { paseComment } from './parser/Comment'
 import { parsePrint, Print } from "./parser/Print"

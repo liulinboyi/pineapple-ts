@@ -1,5 +1,5 @@
 import { Variable } from "../definition";
-import { INTERGER, Lexer, NUMBER, Operator, tokenNameMap, Tokens, TOKEN_EQUAL, TOKEN_IGNORED, TOKEN_LEFT_PAREN, TOKEN_NAME, TOKEN_RIGHT_PAREN, TOKEN_VAR_PREFIX } from "../lexer1";
+import { INTERGER, Lexer, NUMBER, Operator, tokenNameMap, Tokens, TOKEN_EQUAL, TOKEN_IGNORED, TOKEN_LEFT_PAREN, TOKEN_NAME, TOKEN_RIGHT_PAREN, TOKEN_VAR_PREFIX } from "../lexer";
 import { parseNumber, parseString, parseVariable } from "../parser";
 import { parseExpression } from "./Expression";
 

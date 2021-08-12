@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseBinaryExpression = exports.Factor = exports.Trem_tail = exports.Trem = exports.Expression_tail = exports.Expressions = exports.parseAssignment = exports.Assignment = exports.Identifier = exports.Literal = void 0;
-const lexer1_1 = require("../lexer1");
+const lexer_1 = require("../lexer");
 const parser_1 = require("../parser");
 const Expression_1 = require("./Expression");
 class Literal {
@@ -45,12 +45,12 @@ function parseAssignment(lexer) {
     // $a = 1 - 1
     // $a = $b - 1
     // $a = $b - $c
-    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 空格
-    lexer.NextTokenIs(lexer1_1.TOKEN_EQUAL); // =
-    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 空格
+    lexer.LookAheadAndSkip(lexer_1.TOKEN_IGNORED); // 空格
+    lexer.NextTokenIs(lexer_1.TOKEN_EQUAL); // =
+    lexer.LookAheadAndSkip(lexer_1.TOKEN_IGNORED); // 空格
     const tokenType = lexer.LookAhead().tokenType;
     // 如果后面仍是$
-    if (tokenType === lexer1_1.TOKEN_VAR_PREFIX) {
+    if (tokenType === lexer_1.TOKEN_VAR_PREFIX) {
         // 需要Expressions处理
         const Variable = parser_1.parseVariable(lexer); // 标识符,这里面会把邻近的空格回车删掉
         const identifier = new Identifier(Variable.Name);
@@ -58,11 +58,11 @@ function parseAssignment(lexer) {
         assignment.type = "VariableDeclaration";
         assignment.declarations.push(VariableDeclarator); // 一行只允许声明和初始化一个变量
         let ahead = lexer.LookAhead();
-        if (ahead.tokenType !== lexer1_1.Operator) {
+        if (ahead.tokenType !== lexer_1.Operator) {
             return assignment;
         }
         else {
-            lexer.NextTokenIs(lexer1_1.Operator); // +-*/
+            lexer.NextTokenIs(lexer_1.Operator); // +-*/
             // lexer.LookAheadAndSkip(TOKEN_IGNORED) // 空格
             lexer.isIgnored();
             const idAndinit = assignment.declarations.pop();
@@ -70,12 +70,12 @@ function parseAssignment(lexer) {
         }
     }
     else {
-        if (tokenType === lexer1_1.TOKEN_NAME) { // 函数执行并赋值
+        if (tokenType === lexer_1.TOKEN_NAME) { // 函数执行并赋值
             const expression = Expression_1.parseExpression(lexer);
             VariableDeclarator.init = expression.expression;
             assignment.type = "VariableDeclaration";
         }
-        else if (tokenType === lexer1_1.NUMBER || tokenType === lexer1_1.TOKEN_LEFT_PAREN) {
+        else if (tokenType === lexer_1.NUMBER || tokenType === lexer_1.TOKEN_LEFT_PAREN) {
             // 需要Expressions处理
             let ex = new BinaryExpression('');
             const expr = Expressions(lexer, ex);
@@ -92,11 +92,11 @@ function parseAssignment(lexer) {
         }
         assignment.declarations.push(VariableDeclarator); // 一行只允许声明和初始化一个变量
         let ahead = lexer.LookAhead();
-        if (ahead.tokenType !== lexer1_1.Operator) {
+        if (ahead.tokenType !== lexer_1.Operator) {
             return assignment;
         }
         else {
-            lexer.NextTokenIs(lexer1_1.Operator); // +-*/
+            lexer.NextTokenIs(lexer_1.Operator); // +-*/
             // lexer.LookAheadAndSkip(TOKEN_IGNORED); // 空格
             lexer.isIgnored();
             const idAndinit = assignment.declarations.pop();
@@ -119,7 +119,7 @@ function Expression_tail(lexer, value) {
         if (value instanceof BinaryExpression) {
             value.operator = "+";
         }
-        lexer.NextTokenIs(lexer1_1.Operator);
+        lexer.NextTokenIs(lexer_1.Operator);
         const expression = new BinaryExpression("+");
         expression.left = value;
         expression.right = Trem(lexer);
@@ -129,7 +129,7 @@ function Expression_tail(lexer, value) {
         if (value instanceof BinaryExpression) {
             value.operator = "-";
         }
-        lexer.NextTokenIs(lexer1_1.Operator);
+        lexer.NextTokenIs(lexer_1.Operator);
         const expression = new BinaryExpression("-");
         expression.left = value;
         expression.right = Trem(lexer);
@@ -149,14 +149,14 @@ exports.Trem = Trem;
 function Trem_tail(lexer, value) {
     let ahead = lexer.LookAhead();
     if (ahead.token === "*") {
-        lexer.NextTokenIs(lexer1_1.Operator);
+        lexer.NextTokenIs(lexer_1.Operator);
         const expression = new BinaryExpression("*");
         expression.left = value;
         expression.right = Factor(lexer);
         return expression;
     }
     else if (ahead.token === "/") {
-        lexer.NextTokenIs(lexer1_1.Operator);
+        lexer.NextTokenIs(lexer_1.Operator);
         const expression = new BinaryExpression("/");
         expression.left = value;
         expression.right = Factor(lexer);
@@ -176,16 +176,16 @@ function Factor(lexer, expr) {
         let token = "";
         while (lexer.isNumber(ahead.token)) {
             token += ahead.token;
-            lexer.NextTokenIs(lexer1_1.NUMBER);
+            lexer.NextTokenIs(lexer_1.NUMBER);
             ahead = lexer.LookAhead();
         }
-        lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
+        lexer.LookAheadAndSkip(lexer_1.TOKEN_IGNORED);
         return new Literal(+token); // 转换为数字
     }
     else if (ahead.token === "(") {
         // (1 + 2)
-        lexer.NextTokenIs(lexer1_1.TOKEN_LEFT_PAREN);
-        lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
+        lexer.NextTokenIs(lexer_1.TOKEN_LEFT_PAREN);
+        lexer.LookAheadAndSkip(lexer_1.TOKEN_IGNORED);
         // type: "BinaryExpression",
         // left: {
         //     // type: "Identifier",
@@ -197,8 +197,8 @@ function Factor(lexer, expr) {
         //     // name: "b"
         // }
         const exp = Expressions(lexer, expr);
-        lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
-        lexer.NextTokenIs(lexer1_1.TOKEN_RIGHT_PAREN);
+        lexer.LookAheadAndSkip(lexer_1.TOKEN_IGNORED);
+        lexer.NextTokenIs(lexer_1.TOKEN_RIGHT_PAREN);
         return exp;
     }
 }
@@ -234,11 +234,11 @@ function parseBinaryExpression(lexer, idAndinit, assignment, leftType) {
     else if (leftType === "BinaryExpression") {
         BinaryExpression.left = idAndinit.init;
     }
-    if (ahead.tokenType === lexer1_1.NUMBER) {
+    if (ahead.tokenType === lexer_1.NUMBER) {
         const literial = new Literal(parser_1.parseNumber(lexer));
         BinaryExpression.right = literial;
     }
-    else if (ahead.tokenType === lexer1_1.TOKEN_VAR_PREFIX) {
+    else if (ahead.tokenType === lexer_1.TOKEN_VAR_PREFIX) {
         const Variable = parser_1.parseVariable(lexer); // 标识符
         const identifier = new Identifier(Variable.Name);
         BinaryExpression.right = identifier;
@@ -249,8 +249,8 @@ function parseBinaryExpression(lexer, idAndinit, assignment, leftType) {
     VariableDeclarator.init = BinaryExpression;
     assignment.declarations.push(VariableDeclarator);
     let oahead = lexer.LookAhead();
-    if (oahead.tokenType === lexer1_1.Operator) {
-        lexer.NextTokenIs(lexer1_1.Operator); // +-*/
+    if (oahead.tokenType === lexer_1.Operator) {
+        lexer.NextTokenIs(lexer_1.Operator); // +-*/
         // lexer.LookAheadAndSkip(TOKEN_IGNORED); // 空格
         lexer.isIgnored();
         const idAndinits = assignment.declarations.pop();

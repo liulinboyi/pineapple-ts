@@ -1,4 +1,4 @@
-import { COMMENT, Lexer, tokenNameMap, Tokens, TOKEN_IGNORED } from "../lexer1"
+import { COMMENT, Lexer, tokenNameMap, Tokens, TOKEN_IGNORED } from "../lexer"
 
 export interface Comment {
     LineNum?: number,

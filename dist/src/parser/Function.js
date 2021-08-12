@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.paseReturnStatement = exports.paseBlock = exports.parseFunction = void 0;
-const lexer1_1 = require("../lexer1");
+const lexer_1 = require("../lexer");
 const parser_1 = require("../parser");
 const Assignment_1 = require("./Assignment");
 const IfStatement_1 = require("./IfStatement");
@@ -37,19 +37,19 @@ function parseFunction(lexer) {
             ]
         }
     };
-    lexer.NextTokenIs(lexer1_1.TOKEN_FUNC);
-    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 空格
+    lexer.NextTokenIs(lexer_1.TOKEN_FUNC);
+    lexer.LookAheadAndSkip(lexer_1.TOKEN_IGNORED); // 空格
     const Identifier = parser_1.parseName(lexer);
     FunctionDeclaration.id.name = Identifier;
-    lexer.NextTokenIs(lexer1_1.TOKEN_LEFT_PAREN); // (
+    lexer.NextTokenIs(lexer_1.TOKEN_LEFT_PAREN); // (
     const params = [];
-    while (lexer.LookAhead().tokenType !== lexer1_1.TOKEN_RIGHT_PAREN) {
+    while (lexer.LookAhead().tokenType !== lexer_1.TOKEN_RIGHT_PAREN) {
         const p = parser_1.parseVariable(lexer);
         params.push(p);
-        if (lexer.nextTokenType === lexer1_1.TOKEN_RIGHT_PAREN) {
+        if (lexer.nextTokenType === lexer_1.TOKEN_RIGHT_PAREN) {
             break;
         }
-        lexer.NextTokenIs(lexer1_1.TOKEN_FUNC_PARAMS_DIV);
+        lexer.NextTokenIs(lexer_1.TOKEN_FUNC_PARAMS_DIV);
     }
     for (let item of params) {
         FunctionDeclaration.params.push({
@@ -57,23 +57,23 @@ function parseFunction(lexer) {
             name: item.Name
         });
     }
-    lexer.NextTokenIs(lexer1_1.TOKEN_RIGHT_PAREN); // )
-    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 去除空格回车等
-    lexer.NextTokenIs(lexer1_1.BLOCK_START); // {
-    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED); // 去除空格回车等
+    lexer.NextTokenIs(lexer_1.TOKEN_RIGHT_PAREN); // )
+    lexer.LookAheadAndSkip(lexer_1.TOKEN_IGNORED); // 去除空格回车等
+    lexer.NextTokenIs(lexer_1.BLOCK_START); // {
+    lexer.LookAheadAndSkip(lexer_1.TOKEN_IGNORED); // 去除空格回车等
     const BlockStatementBody = [];
     const block = paseBlock(lexer, BlockStatementBody);
     FunctionDeclaration.body.body = block;
-    lexer.NextTokenIs(lexer1_1.BLOCK_END); // }
-    lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
+    lexer.NextTokenIs(lexer_1.BLOCK_END); // }
+    lexer.LookAheadAndSkip(lexer_1.TOKEN_IGNORED);
     return FunctionDeclaration;
 }
 exports.parseFunction = parseFunction;
 function paseBlock(lexer, BlockStatementBody) {
     const ahead = lexer.LookAhead();
-    if (ahead.tokenType === lexer1_1.TOKEN_RETURN) { // return
-        lexer.NextTokenIs(lexer1_1.TOKEN_RETURN);
-        lexer.LookAheadAndSkip(lexer1_1.TOKEN_IGNORED);
+    if (ahead.tokenType === lexer_1.TOKEN_RETURN) { // return
+        lexer.NextTokenIs(lexer_1.TOKEN_RETURN);
+        lexer.LookAheadAndSkip(lexer_1.TOKEN_IGNORED);
         const returnStatement = paseReturnStatement(lexer);
         // returnStatement.argument = returnStatement.declarations[0].init
         // delete returnStatement.declarations
@@ -82,7 +82,7 @@ function paseBlock(lexer, BlockStatementBody) {
             argument: returnStatement.declarations[0].init
         });
     }
-    else if (ahead.tokenType === lexer1_1.TOKEN_VAR_PREFIX) { // $
+    else if (ahead.tokenType === lexer_1.TOKEN_VAR_PREFIX) { // $
         const VariableDeclaration = Assignment_1.parseAssignment(lexer);
         BlockStatementBody.push({
             type: VariableDeclaration.type,
@@ -91,17 +91,17 @@ function paseBlock(lexer, BlockStatementBody) {
         });
         paseBlock(lexer, BlockStatementBody);
     }
-    else if (ahead.tokenType === lexer1_1.TOKEN_PRINT) {
+    else if (ahead.tokenType === lexer_1.TOKEN_PRINT) {
         const print = Print_1.parsePrint(lexer);
         BlockStatementBody.push(print);
         paseBlock(lexer, BlockStatementBody);
     }
-    else if (ahead.tokenType === lexer1_1.TOKEN_IF) {
+    else if (ahead.tokenType === lexer_1.TOKEN_IF) {
         const IfStatement = IfStatement_1.parseIfStatement(lexer);
         BlockStatementBody.push(IfStatement);
         paseBlock(lexer, BlockStatementBody);
     }
-    else if (ahead.tokenType === lexer1_1.TOKEN_FOR) {
+    else if (ahead.tokenType === lexer_1.TOKEN_FOR) {
         const ForStatement = ForOfStatement_1.parseForStatement(lexer);
         BlockStatementBody.push(ForStatement);
         paseBlock(lexer, BlockStatementBody);
@@ -120,18 +120,18 @@ function paseReturnStatement(lexer) {
     VariableDeclarator.id = { type: "Identifier" };
     const tokenType = lexer.LookAhead().tokenType;
     // 如果后面仍是$
-    if (tokenType === lexer1_1.TOKEN_VAR_PREFIX) {
+    if (tokenType === lexer_1.TOKEN_VAR_PREFIX) {
         const Variable = parser_1.parseVariable(lexer); // 标识符,这里面会把邻近的空格回车删掉
         const identifier = new Assignment_1.Identifier(Variable.Name);
         VariableDeclarator.init = identifier;
         assignment.type = "ReturnStatement";
         assignment.declarations.push(VariableDeclarator); // 一行只允许声明和初始化一个变量
         let ahead = lexer.LookAhead();
-        if (ahead.tokenType !== lexer1_1.Operator) {
+        if (ahead.tokenType !== lexer_1.Operator) {
             return assignment;
         }
         else {
-            lexer.NextTokenIs(lexer1_1.Operator); // +-*/
+            lexer.NextTokenIs(lexer_1.Operator); // +-*/
             // lexer.LookAheadAndSkip(TOKEN_IGNORED) // 空格
             lexer.isIgnored();
             const idAndinit = assignment.declarations.pop();
@@ -139,7 +139,7 @@ function paseReturnStatement(lexer) {
         }
     }
     else {
-        if (tokenType === lexer1_1.NUMBER) {
+        if (tokenType === lexer_1.NUMBER) {
             const literial = new Assignment_1.Literal(parser_1.parseNumber(lexer)); // 这里面会把邻近的空格回车删掉
             VariableDeclarator.init = literial;
             assignment.type = "ReturnStatement";
@@ -151,11 +151,11 @@ function paseReturnStatement(lexer) {
         }
         assignment.declarations.push(VariableDeclarator); // 一行只允许声明和初始化一个变量
         let ahead = lexer.LookAhead();
-        if (ahead.tokenType !== lexer1_1.Operator) {
+        if (ahead.tokenType !== lexer_1.Operator) {
             return assignment;
         }
         else {
-            lexer.NextTokenIs(lexer1_1.Operator); // +-*/
+            lexer.NextTokenIs(lexer_1.Operator); // +-*/
             // lexer.LookAheadAndSkip(TOKEN_IGNORED); // 空格
             lexer.isIgnored();
             const idAndinit = assignment.declarations.pop();

@@ -1,4 +1,4 @@
-import { BLOCK_END, BLOCK_START, Lexer, NUMBER, Operator, TOKEN_FOR, TOKEN_IF, TOKEN_IGNORED, TOKEN_LEFT_PAREN, TOKEN_OF, TOKEN_RIGHT_PAREN, TOKEN_VAR_PREFIX } from "../lexer1";
+import { BLOCK_END, BLOCK_START, Lexer, NUMBER, Operator, TOKEN_FOR, TOKEN_IF, TOKEN_IGNORED, TOKEN_LEFT_PAREN, TOKEN_OF, TOKEN_RIGHT_PAREN, TOKEN_VAR_PREFIX } from "../lexer";
 import { parseNumber, parseVariable } from "../parser";
 import { Identifier, Literal } from "./Assignment";
 import { paseBlock } from "./Function";

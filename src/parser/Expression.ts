@@ -1,4 +1,4 @@
-import { Lexer, NUMBER, TOKEN_FUNC_PARAMS_DIV, TOKEN_IGNORED, TOKEN_LEFT_PAREN, TOKEN_NAME, TOKEN_RIGHT_PAREN, TOKEN_VAR_PREFIX } from "../lexer1";
+import { Lexer, NUMBER, TOKEN_FUNC_PARAMS_DIV, TOKEN_IGNORED, TOKEN_LEFT_PAREN, TOKEN_NAME, TOKEN_RIGHT_PAREN, TOKEN_VAR_PREFIX } from "../lexer";
 import { parseName, parseNumber, parseVariable } from "../parser";
 import { Identifier, Literal } from "./Assignment";
 
